@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ArrowOps</title>
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>ArrowOps</h1>
+    <p>Gestion de incidentes de TI</p>
+  </header>
+
+  <main class="container">
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Incidentes</h2>
+        <label>Estado
+          <select id="status-filter">
+            <option value="">Todos</option>
+            <option value="abierto">Abierto</option>
+            <option value="en_progreso">En progreso</option>
+            <option value="resuelto">Resuelto</option>
+            <option value="cerrado">Cerrado</option>
+          </select>
+        </label>
+      </div>
+      <p id="message" class="message" hidden></p>
+      <div id="list"></div>
+    </section>
+  </main>
+
+  <script src="src/api.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>
