@@ -8,6 +8,22 @@ const api = {
     const query = params.toString();
     return request(`/api/incidents${query ? `?${query}` : ''}`);
   },
+
+  getIncident(id) {
+    return request(`/api/incidents/${encodeURIComponent(id)}`);
+  },
+
+  createIncident(data) {
+    return request('/api/incidents', { method: 'POST', body: JSON.stringify(data) });
+  },
+
+  updateIncident(id, data) {
+    return request(`/api/incidents/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(data) });
+  },
+
+  deleteIncident(id) {
+    return request(`/api/incidents/${encodeURIComponent(id)}`, { method: 'DELETE' });
+  },
 };
 
 async function request(url, options = {}) {

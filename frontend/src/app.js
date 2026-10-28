@@ -44,13 +44,19 @@ function renderIncidents(incidents) {
       <td><span class="badge status-${i.status}">${STATUS_LABELS[i.status]}</span></td>
       <td>${escapeHtml(i.reporter || '-')}</td>
       <td class="nowrap">${formatDate(i.createdAt)}</td>
+      <td>
+        <div class="row-actions">
+          <button class="btn btn-sm" data-action="edit" data-id="${i.id}">Editar</button>
+          <button class="btn btn-sm btn-danger" data-action="delete" data-id="${i.id}">Eliminar</button>
+        </div>
+      </td>
     </tr>`).join('');
 
   listEl.innerHTML = `
     <div class="table-wrap">
       <table>
         <thead>
-          <tr><th>Incidente</th><th>Prioridad</th><th>Estado</th><th>Reportado por</th><th>Creado</th></tr>
+          <tr><th>Incidente</th><th>Prioridad</th><th>Estado</th><th>Reportado por</th><th>Creado</th><th></th></tr>
         </thead>
         <tbody>${rows}</tbody>
       </table>
@@ -67,6 +73,49 @@ async function loadIncidents() {
   }
 }
 
+async function saveIncident(event) {
+  event.preventDefault();
+  const data = incidentForm.read();
+  const errors = incidentForm.validate(data);
+  if (errors.length > 0) {
+    incidentForm.showErrors(errors);
+    return;
+  }
+
+  try {
+    const id = incidentForm.editingId();
+    if (id) {
+      await api.updateIncident(id, data);
+    } else {
+      await api.createIncident(data);
+    }
+    incidentForm.reset();
+    await loadIncidents();
+  } catch (err) {
+    incidentForm.showErrors([err.message]);
+  }
+}
+
+async function handleRowAction(event) {
+  const button = event.target.closest('button[data-action]');
+  if (!button) return;
+  const { action, id } = button.dataset;
+
+  try {
+    if (action === 'edit') {
+      incidentForm.fill(await api.getIncident(id));
+    } else if (action === 'delete' && window.confirm('Eliminar este incidente?')) {
+      await api.deleteIncident(id);
+      if (incidentForm.editingId() === id) incidentForm.reset();
+      await loadIncidents();
+    }
+  } catch (err) {
+    showMessage(err.message);
+  }
+}
+
 statusFilterEl.addEventListener('change', loadIncidents);
+incidentForm.el.addEventListener('submit', saveIncident);
+listEl.addEventListener('click', handleRowAction);
 
 loadIncidents();
