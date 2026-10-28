@@ -20,6 +20,18 @@ function createIncidentRepository() {
       incidents.set(incident.id, incident);
       return incident;
     },
+
+    // Mas recientes primero; filtros opcionales por estado y prioridad.
+    list({ status, priority } = {}) {
+      return [...incidents.values()]
+        .filter((i) => !status || i.status === status)
+        .filter((i) => !priority || i.priority === priority)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    },
+
+    findById(id) {
+      return incidents.get(id) || null;
+    },
   };
 }
 
