@@ -1,0 +1,30 @@
+# Dependencias
+node_modules/
+
+# Build / artefactos
+dist/
+build/
+coverage/
+*.tgz
+*.zip
+
+# Secretos y entorno
+.env
+.env.*
+!.env.example
+*.pat
+
+# Datos locales
+*.db
+*.sqlite
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# SO / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
