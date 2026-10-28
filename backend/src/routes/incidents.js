@@ -36,6 +36,25 @@ function createIncidentsRouter(repository) {
     return res.status(201).location(`/api/incidents/${incident.id}`).json(incident);
   });
 
+  router.put('/:id', (req, res) => {
+    const errors = validateIncident(req.body);
+    if (errors.length > 0) {
+      return res.status(400).json({ errors });
+    }
+    const incident = repository.update(req.params.id, req.body);
+    if (!incident) {
+      return res.status(404).json({ errors: ['Incidente no encontrado.'] });
+    }
+    return res.json(incident);
+  });
+
+  router.delete('/:id', (req, res) => {
+    if (!repository.remove(req.params.id)) {
+      return res.status(404).json({ errors: ['Incidente no encontrado.'] });
+    }
+    return res.status(204).end();
+  });
+
   return router;
 }
 

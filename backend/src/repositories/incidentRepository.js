@@ -32,6 +32,27 @@ function createIncidentRepository() {
     findById(id) {
       return incidents.get(id) || null;
     },
+
+    // Reemplaza los campos editables; conserva id y createdAt.
+    update(id, data) {
+      const current = incidents.get(id);
+      if (!current) return null;
+      const updated = {
+        ...current,
+        title: data.title.trim(),
+        description: data.description.trim(),
+        priority: data.priority,
+        status: data.status || current.status,
+        reporter: data.reporter ? data.reporter.trim() : null,
+        updatedAt: new Date().toISOString(),
+      };
+      incidents.set(id, updated);
+      return updated;
+    },
+
+    remove(id) {
+      return incidents.delete(id);
+    },
   };
 }
 
