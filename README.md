@@ -15,6 +15,29 @@ ArrowOps es una solución web para registrar, dar seguimiento y cerrar incidente
 | `.github/workflows/` | GitHub Actions |
 | `azure-pipelines.yml` | Pipeline de CI/CD en Azure Pipelines |
 
+## Ejecutar en local
+
+Requisitos: Node.js 20 o superior.
+
+```bash
+npm install
+npm start        # http://localhost:3000
+npm test
+```
+
+## API
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/health` | Estado del servicio |
+| `GET` | `/api/incidents?status=&priority=` | Lista de incidentes, con filtros opcionales |
+| `GET` | `/api/incidents/:id` | Detalle de un incidente |
+| `POST` | `/api/incidents` | Crea un incidente |
+| `PUT` | `/api/incidents/:id` | Actualiza un incidente |
+| `DELETE` | `/api/incidents/:id` | Elimina un incidente |
+
+Campos: `title` y `description` (obligatorios), `priority` (`baja`, `media`, `alta`, `critica`), `status` (`abierto`, `en_progreso`, `resuelto`, `cerrado`) y `reporter` (opcional).
+
 ## Flujo de trabajo
 
 - Rama principal: `main` (protegida, solo entra código por Pull Request).
