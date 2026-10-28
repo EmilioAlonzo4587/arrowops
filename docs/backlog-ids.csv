@@ -29,3 +29,4 @@
 "29","User Story","Como equipo queremos publicar la version v1.0.0 con ambientes y aprobaciones","25","2","Microsoft.VSTS.Scheduling.StoryPoints=8","ealonzop1@miumg.edu.gt","New"
 "30","Task","Registrar 5 deudas tecnicas y resolver 2","29","2","Microsoft.VSTS.Scheduling.OriginalEstimate=5; Microsoft.VSTS.Scheduling.RemainingWork=5","ealonzop1@miumg.edu.gt","New"
 "31","Task","Aplicar versionado semantico, ambientes con aprobacion y empaquetar v1.0.0","29","2","Microsoft.VSTS.Scheduling.OriginalEstimate=5; Microsoft.VSTS.Scheduling.RemainingWork=5","ealonzop1@miumg.edu.gt","New"
+"32","Task","Documentar arquitectura, branching, deuda tecnica, seguridad, dependencias y release","29","2","Microsoft.VSTS.Scheduling.OriginalEstimate=4; Microsoft.VSTS.Scheduling.RemainingWork=4","ealonzop1@miumg.edu.gt","New"
