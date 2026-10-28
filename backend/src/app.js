@@ -1,3 +1,4 @@
+const path = require('node:path');
 const express = require('express');
 const { createIncidentRepository } = require('./repositories/incidentRepository');
 const { createIncidentsRouter } = require('./routes/incidents');
@@ -9,6 +10,7 @@ function createApp({ repository = createIncidentRepository() } = {}) {
 
   app.get('/health', (req, res) => res.json({ status: 'ok' }));
   app.use('/api/incidents', createIncidentsRouter(repository));
+  app.use(express.static(path.join(__dirname, '..', '..', 'frontend')));
 
   app.use((req, res) => res.status(404).json({ errors: ['Recurso no encontrado.'] }));
 
