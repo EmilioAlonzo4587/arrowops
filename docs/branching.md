@@ -75,3 +75,4 @@ A partir del PR #5 se usará **merge commit**: conserva en `main` cada commit in
 | [#8](https://github.com/EmilioAlonzo4587/arrowops/pull/8) | `feature/github-actions` | AB#21, AB#24 | v0.3.0 |
 | [#9](https://github.com/EmilioAlonzo4587/arrowops/pull/9) a [#13](https://github.com/EmilioAlonzo4587/arrowops/pull/13) | `dependabot/*` | AB#24 | — |
 | [#14](https://github.com/EmilioAlonzo4587/arrowops/pull/14) | `feature/pruebas-y-secretos` | AB#22, AB#23, AB#24 | v0.4.0 |
+| [#15](https://github.com/EmilioAlonzo4587/arrowops/pull/15) | `refactor/persistencia-postgres` | AB#30, AB#33 (TD-01) | — |

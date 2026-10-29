@@ -43,8 +43,25 @@ stages:
           - script: npm run build
             displayName: Build
 
+          # PostgreSQL efimero en Docker (Docker Desktop debe estar corriendo en el agente).
+          # Proyecto y puerto propios (arrowops-ci, 5434) para no tocar la base local de desarrollo.
+          # POSTGRES_PASSWORD es una variable SECRETA del pipeline: hay que mapearla con env.
+          - script: docker compose -p arrowops-ci -f database/docker-compose.yml up -d --wait
+            displayName: Levantar PostgreSQL (docker compose)
+            env:
+              POSTGRES_PASSWORD: $(POSTGRES_PASSWORD)
+              ARROWOPS_DB_PORT: 5434
+
           - script: npm run test:ci
-            displayName: Pruebas con cobertura
+            displayName: Pruebas con cobertura (incluye integracion con PostgreSQL)
+            env:
+              DATABASE_URL: postgres://arrowops:$(POSTGRES_PASSWORD)@localhost:5434/arrowops
+
+          - script: docker compose -p arrowops-ci -f database/docker-compose.yml down -v
+            displayName: Bajar PostgreSQL
+            condition: always()
+            env:
+              POSTGRES_PASSWORD: $(POSTGRES_PASSWORD)
 
           - task: PublishTestResults@2
             displayName: Publicar resultados de pruebas

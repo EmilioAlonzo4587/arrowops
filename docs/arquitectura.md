@@ -2,7 +2,7 @@
 
 ## Visión general
 
-ArrowOps es una aplicación web monolítica con dos capas: una API REST en Node.js + Express 5 y un frontend estático que el mismo proceso sirve. El navegador y la API comparten origen, así que no hace falta configurar CORS.
+ArrowOps es una aplicación web monolítica: una API REST en Node.js + Express 5, un frontend estático que el mismo proceso sirve y una base de datos PostgreSQL 17 en Docker. El navegador y la API comparten origen, así que no hace falta configurar CORS.
 
 ```mermaid
 flowchart LR
@@ -23,10 +23,11 @@ flowchart LR
 | Aplicación | `backend/src/app.js` | `createApp({ repository })`: middleware JSON, rutas, archivos estáticos y manejo de errores (400, 404, 500) |
 | Rutas | `backend/src/routes/incidents.js` | Endpoints del CRUD; traduce los resultados a códigos HTTP |
 | Modelo | `backend/src/models/incident.js` | Estados y prioridades válidos; `validateIncident()` |
-| Repositorio | `backend/src/repositories/incidentRepository.js` | Persistencia: crear, listar con filtros, buscar, actualizar y eliminar |
+| Repositorio PostgreSQL | `backend/src/repositories/postgresIncidentRepository.js` | Persistencia real con consultas parametrizadas (asíncrono) |
+| Repositorio en memoria | `backend/src/repositories/incidentRepository.js` | Misma interfaz sobre un `Map`; se usa sin `DATABASE_URL` (desarrollo rápido y pruebas unitarias) |
 | Frontend | `frontend/` | `index.html`, `src/api.js` (cliente HTTP), `src/form.js` (formulario), `src/app.js` (tabla y eventos) |
-| Pruebas | `tests/api/` | Jest + Supertest contra la app en memoria |
-| Base de datos | `database/` | Reservado para la persistencia real (ver deuda TD-01) |
+| Pruebas | `tests/api/`, `tests/contract/` | Jest + Supertest. Las **pruebas de contrato** corren la misma batería contra los dos repositorios; las de PostgreSQL se ejecutan si hay `DATABASE_URL` (siempre en CI) |
+| Base de datos | `database/` | `docker-compose.yml` (PostgreSQL 17, puerto 5433), `schema.sql` (tabla `incidents` con restricciones e índices) y `seed.sql` |
 
 ## Modelo de datos: incidente
 
@@ -58,7 +59,9 @@ Los errores siempre responden con el formato `{ "errors": ["mensaje", ...] }`.
 | Decisión | Motivo | Consecuencia |
 |---|---|---|
 | Repositorio inyectable en `createApp()` | Cada prueba usa una instancia aislada | Cambiar a una base de datos real solo requiere otra implementación del repositorio |
-| Repositorio en memoria | Entregar el CRUD rápido en v0.x | Los datos se pierden al reiniciar (deuda TD-01) |
+| PostgreSQL en Docker (TD-01) | Persistencia real con restricciones en la base de datos; Docker da el mismo motor en desarrollo y en los dos CI | El agente autohospedado necesita Docker Desktop corriendo |
+| Repositorio elegido por `DATABASE_URL` | Desarrollo y pruebas unitarias rápidas sin base de datos | Las pruebas de contrato garantizan que ambas implementaciones se comportan igual |
+| Rutas `async` con Express 5 | Express 5 envía las promesas rechazadas al manejador de errores | No hace falta `try/catch` en cada ruta |
 | Frontend sin framework ni build | Menos dependencias y un pipeline más simple | Hay que escapar el HTML a mano (ver [seguridad.md](seguridad.md)) |
 | Frontend servido por Express | Un único proceso y un único artefacto, sin CORS | El frontend y la API se despliegan juntos |
 | Un solo `package.json` en la raíz | Un solo `npm ci`, `npm test` y `npm pack` en el pipeline | El backend y el frontend comparten versión |

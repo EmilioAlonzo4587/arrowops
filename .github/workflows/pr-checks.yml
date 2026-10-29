@@ -26,6 +26,24 @@ jobs:
       fail-fast: false
       matrix:
         node: [20, 22]
+    # PostgreSQL efimero para las pruebas de integracion (tests/contract/postgres.test.js).
+    # La contrasena viene de un secreto del repositorio; nunca esta en el codigo.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: arrowops
+          POSTGRES_USER: arrowops
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U arrowops -d arrowops"
+          --health-interval 3s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      DATABASE_URL: postgres://arrowops:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/arrowops
     steps:
       - uses: actions/checkout@v7
 
@@ -40,8 +58,13 @@ jobs:
       - name: Verificar sintaxis (build)
         run: npm run build
 
-      - name: Pruebas
-        run: npm test -- --ci
+      - name: Verificar que el secreto de la base de datos existe
+        env:
+          PG_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        run: test -n "$PG_PASSWORD" || { echo "::error::Falta el secreto POSTGRES_PASSWORD (Settings > Secrets and variables)"; exit 1; }
+
+      - name: Pruebas (incluye integracion con PostgreSQL)
+        run: npm run test:ci
 
       - name: Audit de dependencias de produccion
         run: npm audit --omit=dev --audit-level=high

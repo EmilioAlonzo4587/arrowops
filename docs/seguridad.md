@@ -8,8 +8,9 @@
 |---|---|---|
 | PAT de Azure DevOps (uso local con `az`) | Almacén de credenciales de Windows (`az devops login`) o variable de entorno de la sesión (`AZURE_DEVOPS_EXT_PAT`) | Nunca en archivos del repo ni en scripts |
 | Token del agente autohospedado | El PAT se ingresó solo de forma interactiva en `config.cmd`. El agente guarda sus propias credenciales cifradas en `C:\agents\arrowops`, fuera del repo | Implementado |
-| Variables sensibles del pipeline | Variables secretas o Variable Group de Azure Pipelines | *Planificado (Fase 2)* |
-| Secretos de GitHub Actions | GitHub → Settings → Secrets and variables → Actions | *Planificado (Fase 2)* |
+| `POSTGRES_PASSWORD` (CI en Azure) | **Variable secreta** del pipeline `ArrowOps-CI`. No es heredable por la ejecución (`allow-override false`) | Se mapea con `env:` solo en los pasos de Docker y de pruebas; Azure la enmascara (`***`) en los logs. Implementado |
+| `POSTGRES_PASSWORD` (CI en GitHub) | **Secret** del repositorio (Actions) y **Secret de Dependabot**, con el mismo valor, para que los PR de Dependabot también puedan ejecutar las pruebas | Se inyecta en el servicio `postgres` y en `DATABASE_URL`; GitHub lo enmascara en los logs. Implementado |
+| `POSTGRES_PASSWORD` y `DATABASE_URL` (desarrollo) | Archivo `.env` local, ignorado por git y generado con una contraseña aleatoria | `docker compose --env-file .env`. Implementado |
 
 ### Configuración por variables de entorno
 
@@ -19,10 +20,12 @@ La app lee su configuración de variables de entorno en `backend/src/config.js`.
 |---|---|---|
 | `PORT` | 3000 | Entero entre 1 y 65535; si no es válido, la app no arranca |
 | `NODE_ENV` | `development` | `development`, `test` o `production` |
+| `DATABASE_URL` | — (sin ella se usa el repositorio en memoria) | Debe empezar con `postgres://`. El mensaje de error **no muestra el valor**, porque contiene la contraseña |
 
 - `.env.example` documenta las variables **sin valores reales** y es el único archivo `.env*` que se versiona.
 - Los valores reales se definen en el entorno: el sistema operativo, las variables o Variable Group de Azure Pipelines (las sensibles, marcadas como secretas) o los Secrets de GitHub Actions.
-- Si en el futuro se agregan secretos (por ejemplo, la cadena de conexión de una base de datos, ver TD-01), siguen este mismo patrón: variable de entorno en `config.js`, entrada sin valor en `.env.example` y valor real solo en un almacén de secretos.
+- Los secretos de la base de datos siguen este patrón: variable de entorno en `config.js`, entrada **sin valor** en `.env.example` y valor real solo en `.env` local o en un almacén de secretos. Cada ambiente usa una contraseña distinta: desarrollo y CI no comparten credenciales.
+- `database/docker-compose.yml` exige `POSTGRES_PASSWORD` (`${POSTGRES_PASSWORD:?...}`): sin ella, el contenedor no arranca, en vez de usar una contraseña por defecto.
 
 Controles preventivos:
 
@@ -46,7 +49,9 @@ Controles preventivos:
 | Datos inválidos o maliciosos en la API | Validación de tipos, campos obligatorios, longitud máxima y valores permitidos (enum) | `backend/src/models/incident.js` |
 | JSON mal formado | Responde 400 sin exponer detalles internos | `backend/src/app.js` |
 | Fuga de información en errores | Los errores 500 responden un mensaje genérico; el detalle solo va al log del servidor. Lo verifica una prueba automatizada | `backend/src/app.js`, `tests/api/errors.test.js` |
-| Configuración inválida | `PORT` y `NODE_ENV` se validan al arrancar; la app no inicia con valores inválidos | `backend/src/config.js` |
+| Configuración inválida | `PORT`, `NODE_ENV` y `DATABASE_URL` se validan al arrancar; la app no inicia con valores inválidos | `backend/src/config.js` |
+| Inyección SQL | Todas las consultas usan parámetros (`$1`, `$2`...); nunca se concatenan valores en el SQL | `backend/src/repositories/postgresIncidentRepository.js` |
+| Datos inválidos en la base de datos | Restricciones `CHECK`, `NOT NULL` y longitudes máximas en el esquema, como última línea de defensa. Lo verifica una prueba de integración | `database/schema.sql`, `tests/contract/postgres.test.js` |
 | XSS al renderizar datos del usuario | `escapeHtml()` antes de insertar texto con `innerHTML` | `frontend/src/app.js` |
 | Inyección en URLs | `encodeURIComponent()` en los IDs de las rutas | `frontend/src/api.js` |
 | Filtros arbitrarios | `status` y `priority` se validan contra listas permitidas | `backend/src/routes/incidents.js` |

@@ -13,10 +13,17 @@ function loadConfig(env = process.env) {
     throw new Error(`NODE_ENV invalido: "${nodeEnv}". Valores permitidos: ${ENVIRONMENTS.join(', ')}.`);
   }
 
+  const databaseUrl = env.DATABASE_URL || null;
+  if (databaseUrl && !/^postgres(ql)?:\/\//.test(databaseUrl)) {
+    // No se incluye el valor en el mensaje: contiene la contrasena.
+    throw new Error('DATABASE_URL invalida: debe empezar con postgres:// o postgresql://.');
+  }
+
   return {
     port,
     nodeEnv,
     appVersion: env.npm_package_version || 'dev',
+    databaseUrl,
   };
 }
 

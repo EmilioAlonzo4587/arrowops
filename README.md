@@ -25,7 +25,17 @@ npm start        # http://localhost:3000
 npm test
 ```
 
-Configuración por variables de entorno (ver `.env.example`): `PORT` (3000 por defecto) y `NODE_ENV` (`development`, `test` o `production`).
+Configuración por variables de entorno (ver `.env.example`): `PORT` (3000 por defecto), `NODE_ENV` (`development`, `test` o `production`) y `DATABASE_URL`.
+
+### Con PostgreSQL (Docker)
+
+```bash
+cp .env.example .env     # definir POSTGRES_PASSWORD y DATABASE_URL
+docker compose --env-file .env -f database/docker-compose.yml up -d --wait
+DATABASE_URL=postgres://arrowops:<password>@localhost:5433/arrowops npm start
+```
+
+Sin `DATABASE_URL`, la app usa un repositorio en memoria. Ver [database/README.md](database/README.md).
 
 ## API
 

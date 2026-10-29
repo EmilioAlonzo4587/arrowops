@@ -7,6 +7,7 @@ Las versiones están fijadas exactamente en `package.json` (`--save-exact`). `pa
 | Paquete | Versión | Tipo | Uso |
 |---|---|---|---|
 | `express` | 5.3.0 | producción | Servidor HTTP y API |
+| `pg` | 8.23.1 | producción | Driver de PostgreSQL (node-postgres); se agregó al resolver TD-01. `npm audit --omit=dev`: 0 vulnerabilidades |
 | `jest` | 30.5.2 | desarrollo | Ejecución de pruebas |
 | `jest-junit` | 17.0.0 | desarrollo | Reporte JUnit de pruebas para Azure Pipelines |
 | `supertest` | 7.3.1 | desarrollo | Pruebas HTTP de la API |
