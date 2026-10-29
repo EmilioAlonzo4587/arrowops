@@ -1,0 +1,16 @@
+# Finales de linea definidos por el repositorio, no por la configuracion de cada equipo
+# (core.autocrlf). Resuelve la deuda TD-02: ver docs/deuda-tecnica.md.
+
+# Texto: LF en el repositorio y en la copia de trabajo, en Windows, Linux y macOS.
+* text=auto eol=lf
+
+# Scripts de cmd de Windows: requieren CRLF para ejecutarse correctamente.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Binarios: sin conversion ni diff de texto.
+*.png binary
+*.jpg binary
+*.ico binary
+*.zip binary
+*.tgz binary
