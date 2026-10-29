@@ -1,6 +1,6 @@
 {
   "name": "arrowops",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "ArrowOps - gestion de incidentes de TI",
   "private": true,
   "main": "backend/src/server.js",

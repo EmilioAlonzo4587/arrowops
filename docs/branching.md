@@ -85,3 +85,6 @@ A partir del PR #5 se usará **merge commit**: conserva en `main` cada commit in
 | [#22](https://github.com/EmilioAlonzo4587/arrowops/pull/22) | `feature/release-v2` | AB#55 | v2.0.0 (no desplegada a prod) |
 | [#23](https://github.com/EmilioAlonzo4587/arrowops/pull/23) | `fix/despliegue-artefacto-obsoleto` | AB#56 (Bug) | **v2.0.1** |
 | [#24](https://github.com/EmilioAlonzo4587/arrowops/pull/24) | `feature/evidencias-release-v2` | AB#55 | — |
+| [#25](https://github.com/EmilioAlonzo4587/arrowops/pull/25) | `feature/dashboard-interactivo` | AB#57 | (v2.1.0) |
+| [#26](https://github.com/EmilioAlonzo4587/arrowops/pull/26) | `feature/interfaz-tecnica` | AB#58 | (v2.1.0) |
+| [#27](https://github.com/EmilioAlonzo4587/arrowops/pull/27) | `feature/release-v2.1.0` | AB#59 | **v2.1.0** |
