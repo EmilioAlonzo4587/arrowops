@@ -111,3 +111,42 @@ Tests:       1 failed, 21 passed, 22 total
 | Corrección | Se activaron las alertas de Dependabot (`PUT /repos/{owner}/{repo}/vulnerability-alerts`, respuesta 204), lo que habilita el Dependency graph, y se volvió a ejecutar el job fallido (`gh run rerun --failed`) |
 | Ejecución exitosa | Run `40802055601` → **success**; los 4 checks del PR #8 en verde |
 | Lección | Las acciones de seguridad de GitHub dependen de funciones del repositorio que hay que activar y documentar como parte de la configuración (ver [seguridad.md](seguridad.md)) |
+
+## F-04: el despliegue del tag v2.0.0 tomó un artefacto obsoleto (detenido por la aprobación)
+
+| Campo | Detalle |
+|---|---|
+| Fecha | 2026-10-29 |
+| Ejecución | [#20261029.48](https://dev.azure.com/devopsArrow/ArrowOps/_build/results?buildId=57) (buildId 57), tag `v2.0.0` |
+| Síntoma | `Deploy_dev` terminó en verde, pero `http://localhost:8081/health` respondía `"version":"1.0.0"` en lugar de `2.0.0` |
+| Contención | La etapa `Deploy_prod` esperaba la **aprobación manual**. Se **rechazó** (`Checkpoint.Approval: failed`) y **prod no se tocó**: siguió en 1.0.0 con sus datos |
+| Work Item | Bug **AB#56** (severidad alta) |
+
+### Diagnóstico
+
+1. **Workspace sucio en el agente autohospedado.** `download: current` agrega archivos sin limpiar la carpeta, y en `C:\agents\arrowops\_work\1\arrowops\` había dos artefactos: `arrowops-1.0.0.tgz` (de un despliegue anterior) y `arrowops-2.0.0.tgz`.
+2. **Resolución de versión permisiva.** `Get-ChildItem ... | Select-Object -First 1` tomó el primero en orden alfabético: **1.0.0**.
+3. **Validación autorreferente.** El health check comparaba la versión del ambiente con la versión **resuelta en el paso anterior** (1.0.0), así que confirmó el error en vez de detectarlo.
+4. **Etiqueta de imagen mutable.** `arrowops:1.0.0` se reconstruyó en varias ejecuciones con código distinto, porque los merges a `main` anteriores al cambio de versión también eran "1.0.0". La etiqueta no identificaba un build concreto.
+
+Los agentes de Microsoft son efímeros y no tienen este problema; es propio de un agente autohospedado, que reutiliza su disco entre ejecuciones.
+
+### Corrección (PR #23, v2.0.1)
+
+| Causa | Corrección |
+|---|---|
+| Workspace sucio | `workspace: clean: all` en los jobs de despliegue de `dev` y `prod` |
+| Resolución permisiva | El paso falla si no hay **exactamente un** `.tgz`. En los tags, también falla si la versión del artefacto no coincide con la del tag |
+| Validación autorreferente | En los tags, la versión esperada ahora sale del **tag**, una fuente independiente del artefacto |
+| Etiqueta mutable | La imagen se etiqueta `arrowops:<versión>-<buildId>`, inmutable por ejecución |
+
+Se probó la lógica nueva en local con los 4 escenarios: dos artefactos → falla; tag con otra versión → falla; tag correcto → pasa; `main` → pasa.
+
+**Versionado:** el tag `v2.0.0` **no se reescribe**, porque un tag publicado es inmutable. Queda documentado como *no desplegado a producción*. La corrección se publica como **v2.0.1** (PATCH).
+
+### Lecciones (F-04)
+
+- La aprobación manual no es un trámite: detuvo un despliegue defectuoso antes de llegar a producción.
+- Una validación tiene que comparar contra una fuente independiente de lo que se está validando.
+- En agentes autohospedados hay que limpiar el workspace explícitamente.
+- Las etiquetas de imagen deben ser inmutables, para que cada despliegue y cada rollback apunten a un build exacto.

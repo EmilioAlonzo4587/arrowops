@@ -2,7 +2,16 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); versiones según [Semantic Versioning](https://semver.org/lang/es/).
 
+## [2.0.1] - 2026-10-29
+
+### Corregido
+- **Despliegue (F-04, Bug AB#56):** el despliegue del tag `v2.0.0` tomó un artefacto obsoleto del workspace del agente autohospedado. Ahora el workspace se limpia en cada despliegue, la versión del artefacto se verifica (un único `.tgz`, igual a la del tag) y las imágenes se etiquetan `<versión>-<build>` de forma inmutable (PR #23).
+
+Es la primera versión 2.x desplegada en producción. Incluye todo el alcance funcional de 2.0.0.
+
 ## [2.0.0] - 2026-10-29
+
+> **No desplegada a producción:** la aprobación de `prod` se rechazó al detectar el fallo F-04. Ver 2.0.1.
 
 Alcance funcional completo: operación, seguimiento, consulta e indicadores.
 
@@ -68,6 +77,7 @@ Primera versión estable.
 ### Agregado
 - API para registrar incidentes (`POST /api/incidents`) con validaciones y `GET /health`.
 
+[2.0.1]: https://github.com/EmilioAlonzo4587/arrowops/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/EmilioAlonzo4587/arrowops/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/EmilioAlonzo4587/arrowops/compare/v0.4.0...v1.0.0
 [0.4.0]: https://github.com/EmilioAlonzo4587/arrowops/compare/v0.3.0...v0.4.0
