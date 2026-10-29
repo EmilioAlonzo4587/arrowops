@@ -6,8 +6,8 @@ Las versiones están fijadas exactamente en `package.json` (`--save-exact`). `pa
 
 | Paquete | Versión | Tipo | Uso |
 |---|---|---|---|
-| `express` | 4.22.3 | producción | Servidor HTTP y API |
-| `jest` | 29.7.0 | desarrollo | Ejecución de pruebas |
+| `express` | 5.3.0 | producción | Servidor HTTP y API |
+| `jest` | 30.5.2 | desarrollo | Ejecución de pruebas |
 | `jest-junit` | 17.0.0 | desarrollo | Reporte JUnit de pruebas para Azure Pipelines |
 | `supertest` | 7.3.1 | desarrollo | Pruebas HTTP de la API |
 
@@ -56,6 +56,34 @@ Las versiones están fijadas exactamente en `package.json` (`--save-exact`). `pa
 | [GHSA-w5hq-g745-h8pq](https://github.com/advisories/GHSA-w5hq-g745-h8pq) | `uuid` < 11.1.1 (instalado 8.3.2) | Moderada | Falta comprobar los límites del buffer en v3/v5/v6 cuando se pasa `buf` | `jest-junit@16.0.0` → `uuid` |
 
 **Decisión: corregir.** Hay una versión compatible para el uso que le damos: `jest-junit` 17.0.0, que trae `uuid` 14.0.3. El cambio de versión mayor solo afecta al reporter de pruebas; se comprobó que el reporte JUnit y las 22 pruebas siguen funcionando. Tras la corrección: producción 0, desarrollo 6 bajas (las ya aceptadas). Detectado por el pipeline; ver [fallos-pipeline.md](fallos-pipeline.md), F-01.
+
+### 2026-10-29: primeras actualizaciones de Dependabot (PR #9 a #13)
+
+| PR | Actualización | Tipo | Decisión | Validación |
+|---|---|---|---|---|
+| [#9](https://github.com/EmilioAlonzo4587/arrowops/pull/9) | `actions/dependency-review-action` 4 → 5 | GitHub Actions | Integrar | 4 checks en verde |
+| [#10](https://github.com/EmilioAlonzo4587/arrowops/pull/10) | `actions/setup-node` 4 → 7 | GitHub Actions | Integrar | 4 checks en verde |
+| [#11](https://github.com/EmilioAlonzo4587/arrowops/pull/11) | `actions/checkout` 4 → 7 | GitHub Actions | Integrar | 4 checks en verde |
+| [#12](https://github.com/EmilioAlonzo4587/arrowops/pull/12) | `jest` 29.7.0 → 30.5.2 | desarrollo, mayor | Integrar | 23 pruebas en una copia aislada; las vulnerabilidades bajas pasan de 6 a 5 |
+| [#13](https://github.com/EmilioAlonzo4587/arrowops/pull/13) | `express` 4.22.3 → **5.3.0** | **producción, mayor** | Integrar (ver abajo) | 23 pruebas, prueba de humo del servidor real y 4 checks en verde |
+
+**Decisión sobre Express 5.** Es una versión mayor de la dependencia principal, con cambios incompatibles: sintaxis de rutas de `path-to-regexp` v8, manejo de promesas rechazadas en los handlers y algunas APIs eliminadas. Se analizó el impacto:
+
+- Las rutas de ArrowOps son simples (`/`, `/:id`, `/health`) y no usan comodines ni expresiones regulares.
+- El manejo de JSON mal formado sigue respondiendo 400 (`entity.parse.failed`), y los archivos estáticos responden 200.
+- No usa APIs eliminadas en Express 5.
+- Express 5 es la línea con soporte activo; conviene llegar a v1.0.0 sobre ella y no sobre Express 4.
+
+**Incidente del lockfile (PR #13).** Después de integrar jest 30 (#12), Dependabot rebasó el #13 y dejó `package-lock.json` desincronizado (`Missing: detect-libc@2.1.2 from lock file`). `npm ci` se negó a instalar en los 3 jobs de pruebas. Se regeneró con `@dependabot recreate` y los 4 checks quedaron en verde. Esto confirma el valor de usar `npm ci` en el CI: falla en lugar de instalar algo distinto a lo fijado.
+
+### 2026-10-29: `npm audit` (v0.4.0)
+
+| Alcance | Críticas | Altas | Moderadas | Bajas |
+|---|---|---|---|---|
+| Producción (`--omit=dev`) | 0 | 0 | 0 | 0 |
+| Desarrollo | 0 | 0 | 0 | 5 |
+
+Las 5 bajas siguen viniendo de `deepmerge` ([GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4)) a través de jest 30. Se mantiene la decisión de aceptar el riesgo (deuda TD-07).
 
 ## Criterio de decisión
 

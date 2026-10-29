@@ -29,3 +29,4 @@ Las demás quedan en el backlog con su prioridad para versiones posteriores a v1
 | Fecha | Cambio |
 |---|---|
 | 2026-10-28 | Registro inicial: TD-01 a TD-08 |
+| 2026-10-29 | TD-07: jest 30 (PR #12) reduce las vulnerabilidades bajas de 6 a 5, pero `deepmerge` sigue presente; se mantiene aceptada |

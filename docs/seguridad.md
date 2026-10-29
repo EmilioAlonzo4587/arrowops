@@ -11,12 +11,26 @@
 | Variables sensibles del pipeline | Variables secretas o Variable Group de Azure Pipelines | *Planificado (Fase 2)* |
 | Secretos de GitHub Actions | GitHub → Settings → Secrets and variables → Actions | *Planificado (Fase 2)* |
 
+### Configuración por variables de entorno
+
+La app lee su configuración de variables de entorno en `backend/src/config.js`. No hay valores de configuración fijos en el código:
+
+| Variable | Valor por defecto | Validación |
+|---|---|---|
+| `PORT` | 3000 | Entero entre 1 y 65535; si no es válido, la app no arranca |
+| `NODE_ENV` | `development` | `development`, `test` o `production` |
+
+- `.env.example` documenta las variables **sin valores reales** y es el único archivo `.env*` que se versiona.
+- Los valores reales se definen en el entorno: el sistema operativo, las variables o Variable Group de Azure Pipelines (las sensibles, marcadas como secretas) o los Secrets de GitHub Actions.
+- Si en el futuro se agregan secretos (por ejemplo, la cadena de conexión de una base de datos, ver TD-01), siguen este mismo patrón: variable de entorno en `config.js`, entrada sin valor en `.env.example` y valor real solo en un almacén de secretos.
+
 Controles preventivos:
 
 - `.gitignore` excluye `.env`, `.env.*` (menos `.env.example`) y `*.pat`.
 - Los scripts de `devops/scripts/` leen el PAT del entorno; no lo reciben como parámetro ni lo escriben en disco.
 - El checklist del PR incluye: "No hay credenciales, tokens ni claves en el código".
 - **Secret scanning** y **push protection** de GitHub activos (Settings → Code security). Un `git push` que contenga un token conocido (de GitHub, Azure, etc.) se rechaza antes de llegar al repo.
+- **gitleaks en GitHub Actions** (job `Escaneo de secretos`): revisa **todo el historial** de commits en cada PR y en cada push a `main`. Detecta patrones de credenciales que el secret scanning de GitHub no cubre.
 - **Dependabot alerts** y **Dependency graph** activos desde el 2026-10-29 (ver [fallos-pipeline.md](fallos-pipeline.md), F-03).
 
 ## Incidentes de seguridad
@@ -31,7 +45,8 @@ Controles preventivos:
 |---|---|---|
 | Datos inválidos o maliciosos en la API | Validación de tipos, campos obligatorios, longitud máxima y valores permitidos (enum) | `backend/src/models/incident.js` |
 | JSON mal formado | Responde 400 sin exponer detalles internos | `backend/src/app.js` |
-| Fuga de información en errores | Los errores 500 responden un mensaje genérico; el detalle solo va al log del servidor | `backend/src/app.js` |
+| Fuga de información en errores | Los errores 500 responden un mensaje genérico; el detalle solo va al log del servidor. Lo verifica una prueba automatizada | `backend/src/app.js`, `tests/api/errors.test.js` |
+| Configuración inválida | `PORT` y `NODE_ENV` se validan al arrancar; la app no inicia con valores inválidos | `backend/src/config.js` |
 | XSS al renderizar datos del usuario | `escapeHtml()` antes de insertar texto con `innerHTML` | `frontend/src/app.js` |
 | Inyección en URLs | `encodeURIComponent()` en los IDs de las rutas | `frontend/src/api.js` |
 | Filtros arbitrarios | `status` y `priority` se validan contra listas permitidas | `backend/src/routes/incidents.js` |

@@ -25,6 +25,8 @@ npm start        # http://localhost:3000
 npm test
 ```
 
+Configuración por variables de entorno (ver `.env.example`): `PORT` (3000 por defecto) y `NODE_ENV` (`development`, `test` o `production`).
+
 ## API
 
 | Método | Ruta | Descripción |

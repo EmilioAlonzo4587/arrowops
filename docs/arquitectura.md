@@ -2,7 +2,7 @@
 
 ## Visión general
 
-ArrowOps es una aplicación web monolítica con dos capas: una API REST en Node.js + Express y un frontend estático que el mismo proceso sirve. El navegador y la API comparten origen, así que no hace falta configurar CORS.
+ArrowOps es una aplicación web monolítica con dos capas: una API REST en Node.js + Express 5 y un frontend estático que el mismo proceso sirve. El navegador y la API comparten origen, así que no hace falta configurar CORS.
 
 ```mermaid
 flowchart LR
@@ -18,7 +18,8 @@ flowchart LR
 
 | Componente | Ubicación | Responsabilidad |
 |---|---|---|
-| Servidor | `backend/src/server.js` | Arranca la app en `PORT` (3000 por defecto) |
+| Servidor | `backend/src/server.js` | Carga la configuración y arranca la app |
+| Configuración | `backend/src/config.js` | Lee y valida `PORT` y `NODE_ENV` desde variables de entorno (ver `.env.example`) |
 | Aplicación | `backend/src/app.js` | `createApp({ repository })`: middleware JSON, rutas, archivos estáticos y manejo de errores (400, 404, 500) |
 | Rutas | `backend/src/routes/incidents.js` | Endpoints del CRUD; traduce los resultados a códigos HTTP |
 | Modelo | `backend/src/models/incident.js` | Estados y prioridades válidos; `validateIncident()` |

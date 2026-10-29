@@ -21,7 +21,7 @@ Configurada en GitHub (Settings → Branches):
 - La regla también aplica a administradores (`enforce_admins`).
 - Aprobaciones requeridas: 0. El proyecto es individual y GitHub no permite aprobar un PR propio (ver "Revisión").
 - **Check obligatorio `ArrowOps-CI`** (Azure Pipelines), con `strict`: la rama debe estar actualizada con `main`. Un PR con el pipeline en rojo queda `BLOCKED` (ver [fallos-pipeline.md](fallos-pipeline.md), F-02).
-- **Checks obligatorios de GitHub Actions** (workflow `PR checks`): `Build y pruebas (Node 20)`, `Build y pruebas (Node 22)` y `Revision de dependencias`.
+- **Checks obligatorios de GitHub Actions** (workflow `PR checks`): `Build y pruebas (Node 20)`, `Build y pruebas (Node 22)`, `Revision de dependencias` y `Escaneo de secretos`.
 
 ## PR de Dependabot
 
@@ -73,3 +73,5 @@ A partir del PR #5 se usará **merge commit**: conserva en `main` cada commit in
 | [#6](https://github.com/EmilioAlonzo4587/arrowops/pull/6) | `feature/azure-pipelines` | AB#20, AB#27, AB#24, AB#28 | — |
 | [#7](https://github.com/EmilioAlonzo4587/arrowops/pull/7) | `fix/pipeline-fallo-controlado` | AB#28 | — |
 | [#8](https://github.com/EmilioAlonzo4587/arrowops/pull/8) | `feature/github-actions` | AB#21, AB#24 | v0.3.0 |
+| [#9](https://github.com/EmilioAlonzo4587/arrowops/pull/9) a [#13](https://github.com/EmilioAlonzo4587/arrowops/pull/13) | `dependabot/*` | AB#24 | — |
+| [#14](https://github.com/EmilioAlonzo4587/arrowops/pull/14) | `feature/pruebas-y-secretos` | AB#22, AB#23, AB#24 | v0.4.0 |
