@@ -10,6 +10,7 @@
 | [release.md](release.md) | Versionado semántico, ambientes, aprobaciones y artefactos |
 | [changelog.md](changelog.md) | Cambios de cada versión, de v0.1.0 a v1.0.0 |
 | [fallos-pipeline.md](fallos-pipeline.md) | Fallos del pipeline: evidencia, diagnóstico, corrección y ejecución exitosa |
+| [evidencias/](evidencias/README.md) | Dónde verificar cada requisito (las capturas se entregan aparte, sin publicarse) |
 | [backlog-ids.csv](backlog-ids.csv) | IDs de los Work Items creados en Azure Boards |
 
 Los documentos se actualizan en cada fase. Cada uno indica qué está **implementado** y qué está **planificado**.
