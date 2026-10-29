@@ -1,13 +1,14 @@
 const { loadConfig } = require('../../backend/src/config');
+const { version } = require('../../package.json');
 
 describe('loadConfig', () => {
   test('usa valores por defecto sin variables de entorno', () => {
-    expect(loadConfig({})).toEqual({ port: 3000, nodeEnv: 'development', appVersion: 'dev', databaseUrl: null });
+    expect(loadConfig({})).toEqual({ port: 3000, nodeEnv: 'development', appVersion: version, databaseUrl: null });
   });
 
-  test('lee PORT, NODE_ENV y la version del paquete', () => {
-    const config = loadConfig({ PORT: '8080', NODE_ENV: 'production', npm_package_version: '0.4.0' });
-    expect(config).toEqual({ port: 8080, nodeEnv: 'production', appVersion: '0.4.0', databaseUrl: null });
+  test('lee PORT y NODE_ENV; la version sale de package.json', () => {
+    const config = loadConfig({ PORT: '8080', NODE_ENV: 'production' });
+    expect(config).toEqual({ port: 8080, nodeEnv: 'production', appVersion: version, databaseUrl: null });
   });
 
   test.each(['abc', '0', '70000', '3000.5'])('rechaza PORT invalido: %s', (port) => {

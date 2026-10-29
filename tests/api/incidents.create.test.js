@@ -81,6 +81,6 @@ describe('GET /health', () => {
   test('responde ok', async () => {
     const res = await request(createApp()).get('/health');
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ status: 'ok' });
+    expect(res.body).toEqual({ status: 'ok', version: require('../../package.json').version });
   });
 });

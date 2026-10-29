@@ -1,0 +1,37 @@
+# Ambiente de ArrowOps (app + PostgreSQL). Un proyecto de Compose por ambiente:
+#   docker compose -p arrowops-dev  -f devops/deploy/docker-compose.yml up -d --wait
+#   docker compose -p arrowops-prod -f devops/deploy/docker-compose.yml up -d --wait
+# Variables: APP_VERSION, APP_PORT y POSTGRES_PASSWORD (secreta, la inyecta el pipeline).
+
+services:
+  app:
+    image: arrowops:${APP_VERSION:?Definir APP_VERSION}
+    environment:
+      DATABASE_URL: postgres://arrowops:${POSTGRES_PASSWORD:?Definir POSTGRES_PASSWORD}@db:5432/arrowops
+    ports:
+      - "${APP_PORT:?Definir APP_PORT}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: arrowops
+      POSTGRES_USER: arrowops
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    # Sin puertos publicados: la base de datos solo es accesible desde la app (red interna).
+    volumes:
+      - data:/var/lib/postgresql/data
+      - ../../database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U arrowops -d arrowops"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  # Persistente entre despliegues: los datos sobreviven a una nueva version de la app.
+  data:

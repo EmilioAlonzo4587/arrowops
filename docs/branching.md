@@ -77,3 +77,4 @@ A partir del PR #5 se usará **merge commit**: conserva en `main` cada commit in
 | [#14](https://github.com/EmilioAlonzo4587/arrowops/pull/14) | `feature/pruebas-y-secretos` | AB#22, AB#23, AB#24 | v0.4.0 |
 | [#15](https://github.com/EmilioAlonzo4587/arrowops/pull/15) | `refactor/persistencia-postgres` | AB#30, AB#33 (TD-01) | — |
 | [#16](https://github.com/EmilioAlonzo4587/arrowops/pull/16) | `refactor/normalizar-finales-linea` | AB#34 (TD-02) | — |
+| [#17](https://github.com/EmilioAlonzo4587/arrowops/pull/17) | `feature/release-v1` | AB#29, AB#31 | **v1.0.0** |

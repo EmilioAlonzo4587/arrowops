@@ -2,13 +2,15 @@ const path = require('node:path');
 const express = require('express');
 const { createIncidentRepository } = require('./repositories/incidentRepository');
 const { createIncidentsRouter } = require('./routes/incidents');
+const { version: packageVersion } = require('../../package.json');
 
-function createApp({ repository = createIncidentRepository() } = {}) {
+function createApp({ repository = createIncidentRepository(), version = packageVersion } = {}) {
   const app = express();
 
   app.use(express.json());
 
-  app.get('/health', (req, res) => res.json({ status: 'ok' }));
+  // La version permite al pipeline verificar que el ambiente corre la version esperada.
+  app.get('/health', (req, res) => res.json({ status: 'ok', version }));
   app.use('/api/incidents', createIncidentsRouter(repository));
   app.use(express.static(path.join(__dirname, '..', '..', 'frontend')));
 

@@ -1,0 +1,54 @@
+# Pasos de despliegue de un ambiente de ArrowOps. Los usan Deploy_dev y Deploy_prod
+# en azure-pipelines.yml, asi ambos ambientes se despliegan exactamente igual.
+parameters:
+  - name: project        # proyecto de Docker Compose (aisla contenedores y volumenes)
+    type: string
+  - name: port           # puerto del host donde queda publicada la app
+    type: string
+  - name: postgresPassword
+    type: string
+
+steps:
+  - checkout: self
+    displayName: Checkout (archivos de despliegue)
+
+  - download: current
+    artifact: arrowops
+    displayName: Descargar artefacto del CI
+
+  - powershell: |
+      $tgz = Get-ChildItem "$(Pipeline.Workspace)/arrowops/arrowops-*.tgz" | Select-Object -First 1
+      $version = $tgz.BaseName -replace '^arrowops-', ''
+      Write-Host "Artefacto: $($tgz.Name) -> version $version"
+      Write-Host "##vso[task.setvariable variable=APP_VERSION]$version"
+    displayName: Resolver version del artefacto
+
+  - script: docker build -f devops/deploy/Dockerfile -t arrowops:$(APP_VERSION) "$(Pipeline.Workspace)/arrowops"
+    displayName: Construir imagen arrowops:$(APP_VERSION) desde el artefacto
+
+  - script: docker compose -p ${{ parameters.project }} -f devops/deploy/docker-compose.yml up -d --wait
+    displayName: Desplegar ${{ parameters.project }} (puerto ${{ parameters.port }})
+    env:
+      APP_VERSION: $(APP_VERSION)
+      APP_PORT: ${{ parameters.port }}
+      POSTGRES_PASSWORD: ${{ parameters.postgresPassword }}
+
+  # Validacion posterior al despliegue: la app responde y corre la version esperada.
+  - powershell: |
+      $url = "http://localhost:${{ parameters.port }}/health"
+      for ($i = 1; $i -le 10; $i++) {
+        try {
+          $health = Invoke-RestMethod $url -TimeoutSec 5
+          if ($health.status -eq 'ok' -and $health.version -eq '$(APP_VERSION)') {
+            Write-Host "Health check OK: $url -> version $($health.version)"
+            exit 0
+          }
+          Write-Host "Intento ${i}: version $($health.version), se espera $(APP_VERSION)"
+        } catch {
+          Write-Host "Intento ${i}: sin respuesta ($($_.Exception.Message))"
+        }
+        Start-Sleep -Seconds 3
+      }
+      Write-Host "##vso[task.logissue type=error]Health check fallido en $url"
+      exit 1
+    displayName: Health check y verificacion de version

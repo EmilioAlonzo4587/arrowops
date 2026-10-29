@@ -10,6 +10,8 @@
 | Token del agente autohospedado | El PAT se ingresó solo de forma interactiva en `config.cmd`. El agente guarda sus propias credenciales cifradas en `C:\agents\arrowops`, fuera del repo | Implementado |
 | `POSTGRES_PASSWORD` (CI en Azure) | **Variable secreta** del pipeline `ArrowOps-CI`. No es heredable por la ejecución (`allow-override false`) | Se mapea con `env:` solo en los pasos de Docker y de pruebas; Azure la enmascara (`***`) en los logs. Implementado |
 | `POSTGRES_PASSWORD` (CI en GitHub) | **Secret** del repositorio (Actions) y **Secret de Dependabot**, con el mismo valor, para que los PR de Dependabot también puedan ejecutar las pruebas | Se inyecta en el servicio `postgres` y en `DATABASE_URL`; GitHub lo enmascara en los logs. Implementado |
+| `POSTGRES_PASSWORD` (ambiente `dev`) | La misma variable secreta del pipeline que usa el CI | Se inyecta con `env:` al desplegar `arrowops-dev`. Implementado |
+| `POSTGRES_PASSWORD_PROD` (ambiente `prod`) | **Variable secreta propia** del pipeline, distinta de la de CI y dev | Solo la usa la etapa `Deploy_prod`, que requiere aprobación manual. Implementado |
 | `POSTGRES_PASSWORD` y `DATABASE_URL` (desarrollo) | Archivo `.env` local, ignorado por git y generado con una contraseña aleatoria | `docker compose --env-file .env`. Implementado |
 
 ### Configuración por variables de entorno
@@ -55,6 +57,16 @@ Controles preventivos:
 | XSS al renderizar datos del usuario | `escapeHtml()` antes de insertar texto con `innerHTML` | `frontend/src/app.js` |
 | Inyección en URLs | `encodeURIComponent()` en los IDs de las rutas | `frontend/src/api.js` |
 | Filtros arbitrarios | `status` y `priority` se validan contra listas permitidas | `backend/src/routes/incidents.js` |
+
+## Controles en el despliegue
+
+| Riesgo | Control |
+|---|---|
+| Desplegar algo distinto a lo probado | La imagen se construye desde el `.tgz` del CI, no desde el código |
+| Contenedor con privilegios | La app corre como usuario `node`, no como root |
+| Base de datos expuesta | El contenedor `db` de cada ambiente no publica puertos; solo la app lo alcanza por la red interna de Compose |
+| Despliegue no autorizado a producción | `Deploy_prod` solo corre con tags `v*` y requiere aprobación manual en el Environment `arrowops-prod` |
+| Despliegue defectuoso | Health check posterior con verificación de versión; si falla, la etapa falla |
 
 ## Controles en el proceso
 

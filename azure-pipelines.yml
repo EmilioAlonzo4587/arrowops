@@ -1,6 +1,8 @@
-# Pipeline CI de ArrowOps.
-# Etapas: checkout, instalacion, build, pruebas, revision de dependencias,
-# empaquetado y publicacion del artefacto. Corre en el agente autohospedado.
+# Pipeline CI/CD de ArrowOps. Corre en el agente autohospedado.
+#   CI          -> checkout, instalacion, build, pruebas, dependencias, empaquetado y artefacto (siempre)
+#   Deploy_dev  -> ambiente arrowops-dev (merge a main y tags v*)
+#   Deploy_prod -> ambiente arrowops-prod con aprobacion manual (solo tags v*)
+# Estrategia de release: docs/release.md.
 
 name: $(Date:yyyyMMdd)$(Rev:.r)
 
@@ -8,6 +10,9 @@ trigger:
   branches:
     include:
       - main
+  tags:
+    include:
+      - v*
 
 pr:
   branches:
@@ -101,3 +106,45 @@ stages:
               targetPath: $(Build.ArtifactStagingDirectory)
               artifact: arrowops
               publishLocation: pipeline
+
+  # Despliegue continuo a dev: cada merge a main y cada tag de version. Nunca en PR.
+  - stage: Deploy_dev
+    displayName: Desplegar en dev
+    dependsOn: CI
+    condition: >-
+      and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'),
+          or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),
+             startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
+    jobs:
+      - deployment: deploy_dev
+        displayName: arrowops-dev (http://localhost:8081)
+        environment: arrowops-dev
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: devops/deploy/deploy-steps.yml
+                  parameters:
+                    project: arrowops-dev
+                    port: '8081'
+                    postgresPassword: $(POSTGRES_PASSWORD)
+
+  # Release a prod: solo tags vX.Y.Z, despues de dev, con aprobacion manual
+  # configurada en el Environment arrowops-prod (Approvals and checks).
+  - stage: Deploy_prod
+    displayName: Desplegar en prod
+    dependsOn: Deploy_dev
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
+    jobs:
+      - deployment: deploy_prod
+        displayName: arrowops-prod (http://localhost:8080)
+        environment: arrowops-prod
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: devops/deploy/deploy-steps.yml
+                  parameters:
+                    project: arrowops-prod
+                    port: '8080'
+                    postgresPassword: $(POSTGRES_PASSWORD_PROD)
