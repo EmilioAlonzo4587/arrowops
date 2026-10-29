@@ -115,11 +115,22 @@ describe('GET /api/stats', () => {
       criticos: 2,
       porEstado: { NUEVO: 1, ASIGNADO: 0, EN_PROCESO: 1, RESUELTO: 1, CERRADO: 1 },
       porCategoria: { hardware: 1, software: 2, red: 1, accesos: 0, otro: 0 },
-      porTecnico: { 'Sin asignar': 1, 'Ana Lopez': 1 },
+      // Todos los tecnicos del catalogo, aunque tengan 0 abiertos (Carlos solo tiene uno resuelto).
+      porTecnico: { 'Ana Lopez': 1, 'Carlos Perez': 0, 'Jorge Ramirez': 0, 'Maria Garcia': 0, 'Sin asignar': 1 },
     });
   });
 
   test('sin incidentes devuelve ceros', () => {
-    expect(computeStats([])).toMatchObject({ total: 0, abiertos: 0, cerrados: 0, criticos: 0, porTecnico: {} });
+    expect(computeStats([])).toMatchObject({ total: 0, abiertos: 0, cerrados: 0, criticos: 0, porTecnico: { 'Sin asignar': 0 } });
+  });
+
+  test('cuenta solo abiertos por tecnico y conserva tecnicos inactivos con carga', () => {
+    const tech = (id, name) => ({ id, name });
+    const stats = computeStats([
+      { status: 'EN_PROCESO', priority: 'media', category: 'red', technician: tech(1, 'Ana Lopez') },
+      { status: 'CERRADO', priority: 'media', category: 'red', technician: tech(2, 'Carlos Perez') },
+      { status: 'ASIGNADO', priority: 'media', category: 'red', technician: tech(9, 'Tecnico Inactivo') },
+    ], [tech(1, 'Ana Lopez'), tech(2, 'Carlos Perez')]);
+    expect(stats.porTecnico).toEqual({ 'Ana Lopez': 1, 'Carlos Perez': 0, 'Sin asignar': 0, 'Tecnico Inactivo': 1 });
   });
 });

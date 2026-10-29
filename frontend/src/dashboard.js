@@ -18,14 +18,16 @@ const dashboard = {
     });
   },
 
-  // Barras horizontales proporcionales al valor maximo, ordenadas de mayor a menor.
+  // Barras horizontales proporcionales al valor maximo, ordenadas de mayor a menor
+  // ("Sin asignar" siempre al final: no es un tecnico). Se muestran tambien las de valor 0.
   // Cada barra es un boton con los filtros (filtersOf) que aplica a la lista.
   renderBars(containerId, counts, labels, filtersOf) {
     const container = document.getElementById(containerId);
     container.replaceChildren();
 
-    const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-    if (entries.length === 0 || entries.every(([, n]) => n === 0)) {
+    const last = (key) => (key === 'Sin asignar' ? 1 : 0);
+    const entries = Object.entries(counts).sort((a, b) => last(a[0]) - last(b[0]) || b[1] - a[1]);
+    if (entries.length === 0) {
       const empty = document.createElement('p');
       empty.className = 'empty';
       empty.textContent = 'Sin datos.';
@@ -50,6 +52,7 @@ const dashboard = {
       const fill = document.createElement('span');
       fill.className = 'bar-fill';
       fill.style.width = `${max ? (value / max) * 100 : 0}%`;
+      if (key === 'Sin asignar') row.classList.add('bar-unassigned');
       track.append(fill);
 
       const count = document.createElement('span');

@@ -10,7 +10,8 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); v
 - Indicador de estado del sistema en el encabezado (en línea y versión desplegada, según `/health`) (AB#58).
 
 ### Cambiado
-- **Rediseño visual (AB#58):** fondo con cuadrícula técnica discreta, encabezado oscuro, logotipo con flecha bajo el nombre, tipografía IBM Plex Sans y Plex Mono (servida localmente, sin internet), y paneles, tabla, insignias y filtros con un estilo más sobrio.
+- **Abiertos por técnico (AB#58):** `/api/stats` incluye a todos los técnicos activos aunque tengan 0 incidentes abiertos; en el dashboard *Sin asignar* se muestra separado, al final, porque no es un técnico.
+- **Rediseño visual (AB#58):** fondo gris azulado con cuadrícula técnica discreta, encabezado azul petróleo, logotipo con flecha bajo el nombre, tipografía IBM Plex Sans y Plex Mono (servida localmente, sin internet), y paneles, tabla, insignias y filtros con un estilo más sobrio.
 
 ## [2.0.1] - 2026-10-29
 

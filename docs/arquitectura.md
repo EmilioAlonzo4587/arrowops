@@ -80,7 +80,7 @@ Cada incidente tiene un historial en la tabla `incident_events`. Se registra aut
 | Cerrados | `CERRADO` |
 | Críticos | Prioridad `critica` y todavía abiertos |
 | Por categoría | Todos los incidentes, por `category` |
-| Por técnico | Incidentes **abiertos** por técnico (carga de trabajo), con `Sin asignar` aparte |
+| Por técnico | Incidentes **abiertos** por técnico (carga de trabajo). Incluye a **todos** los técnicos activos, también con 0, y `Sin asignar` aparte (se muestra al final). Los incidentes cerrados o resueltos no cuentan |
 
 Cada indicador es clicable y aplica a la lista el mismo criterio con el que se calculó: *Abiertos* → `open=true`; *Críticos* → `open=true&priority=critica`; *Cerrados* → `status=CERRADO`; una categoría → `category=…`; un técnico → `open=true&technicianId=…` (`none` para *Sin asignar*). Así, el número de la tarjeta coincide con las filas que se muestran.
 
