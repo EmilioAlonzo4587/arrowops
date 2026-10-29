@@ -64,3 +64,5 @@ A partir del PR #5 se usará **merge commit**: conserva en `main` cada commit in
 | [#2](https://github.com/EmilioAlonzo4587/arrowops/pull/2) | `feature/api-gestion-incidentes` | AB#7, AB#8, AB#9 | — |
 | [#3](https://github.com/EmilioAlonzo4587/arrowops/pull/3) | `feature/frontend-listado` | AB#11, AB#12, AB#13 | — |
 | [#4](https://github.com/EmilioAlonzo4587/arrowops/pull/4) | `feature/frontend-formulario` | AB#14, AB#15, AB#16 | v0.2.0 |
+| [#5](https://github.com/EmilioAlonzo4587/arrowops/pull/5) | `feature/documentacion` | AB#32 | — |
+| [#6](https://github.com/EmilioAlonzo4587/arrowops/pull/6) | `feature/azure-pipelines` | AB#20, AB#27 | — |

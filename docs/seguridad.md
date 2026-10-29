@@ -7,7 +7,7 @@
 | Secreto | Dónde vive | Cómo se usa |
 |---|---|---|
 | PAT de Azure DevOps (uso local con `az`) | Almacén de credenciales de Windows (`az devops login`) o variable de entorno de la sesión (`AZURE_DEVOPS_EXT_PAT`) | Nunca en archivos del repo ni en scripts |
-| Token del agente autohospedado | Solo durante el registro del agente; no se guarda en el repo | *Planificado (Fase 2)* |
+| Token del agente autohospedado | El PAT se ingresó solo de forma interactiva en `config.cmd`. El agente guarda sus propias credenciales cifradas en `C:\agents\arrowops`, fuera del repo | Implementado |
 | Variables sensibles del pipeline | Variables secretas o Variable Group de Azure Pipelines | *Planificado (Fase 2)* |
 | Secretos de GitHub Actions | GitHub → Settings → Secrets and variables → Actions | *Planificado (Fase 2)* |
 

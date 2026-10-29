@@ -27,7 +27,14 @@ La versión vive en `package.json` y se marca con un **tag anotado** `vX.Y.Z` so
 
 ## Artefacto
 
-*Planificado (Fase 2):* el pipeline genera un único artefacto versionado con `npm pack`, `arrowops-<version>.tgz`. Contiene `backend/`, `frontend/` y `package.json`, sin pruebas ni dependencias de desarrollo. Se publica como artefacto de Azure Pipelines y, en las versiones etiquetadas, también como GitHub Release.
+**Implementado.** El pipeline `ArrowOps-CI` genera un único artefacto versionado con `npm pack`, `arrowops-<version>.tgz`. Solo contiene lo que se ejecuta en producción, según el campo `files` de `package.json`: `backend/src`, `frontend/`, `README.md` y `package.json` (12 archivos, sin pruebas ni dependencias de desarrollo). Se publica como el artefacto de pipeline `arrowops`. *Planificado (Fase 3):* en las versiones etiquetadas, también como GitHub Release.
+
+Para instalarlo en un servidor:
+
+```bash
+npm install --omit=dev ./arrowops-<version>.tgz
+node node_modules/arrowops/backend/src/server.js
+```
 
 ## Ambientes y controles
 
