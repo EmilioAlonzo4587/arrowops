@@ -79,3 +79,4 @@ A partir del PR #5 se usará **merge commit**: conserva en `main` cada commit in
 | [#16](https://github.com/EmilioAlonzo4587/arrowops/pull/16) | `refactor/normalizar-finales-linea` | AB#34 (TD-02) | — |
 | [#17](https://github.com/EmilioAlonzo4587/arrowops/pull/17) | `feature/release-v1` | AB#29, AB#31 | **v1.0.0** |
 | [#18](https://github.com/EmilioAlonzo4587/arrowops/pull/18) | `feature/cierre-release-v1` | AB#31 | — |
+| [#19](https://github.com/EmilioAlonzo4587/arrowops/pull/19) | `feature/docker-compose-proyecto` | AB#41 | — |

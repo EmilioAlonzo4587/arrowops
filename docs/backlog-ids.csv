@@ -38,3 +38,4 @@
 "38","Task","TD-06: Frontend sin pruebas de comportamiento","30","2","Microsoft.VSTS.Scheduling.OriginalEstimate=5; Microsoft.VSTS.Scheduling.RemainingWork=5","ealonzop1@miumg.edu.gt","New"
 "39","Task","TD-07: Vulnerabilidades bajas en deepmerge via jest (aceptada)","30","4","Microsoft.VSTS.Scheduling.OriginalEstimate=1; Microsoft.VSTS.Scheduling.RemainingWork=1","ealonzop1@miumg.edu.gt","New"
 "40","Task","TD-08: Perdida de trazabilidad por squash merge (mitigada)","30","4","Microsoft.VSTS.Scheduling.OriginalEstimate=1; Microsoft.VSTS.Scheduling.RemainingWork=1","ealonzop1@miumg.edu.gt","New"
+"41","Task","Docker Compose en la raiz para levantar todo el proyecto (evaluacion)","29","2","Microsoft.VSTS.Scheduling.OriginalEstimate=2; Microsoft.VSTS.Scheduling.RemainingWork=2","ealonzop1@miumg.edu.gt","New"
