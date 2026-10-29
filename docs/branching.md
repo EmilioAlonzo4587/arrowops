@@ -21,7 +21,11 @@ Configurada en GitHub (Settings → Branches):
 - La regla también aplica a administradores (`enforce_admins`).
 - Aprobaciones requeridas: 0. El proyecto es individual y GitHub no permite aprobar un PR propio (ver "Revisión").
 - **Check obligatorio `ArrowOps-CI`** (Azure Pipelines), con `strict`: la rama debe estar actualizada con `main`. Un PR con el pipeline en rojo queda `BLOCKED` (ver [fallos-pipeline.md](fallos-pipeline.md), F-02).
-- *Planificado:* sumar el workflow de GitHub Actions como segundo check obligatorio.
+- **Checks obligatorios de GitHub Actions** (workflow `PR checks`): `Build y pruebas (Node 20)`, `Build y pruebas (Node 22)` y `Revision de dependencias`.
+
+## PR de Dependabot
+
+Dependabot abre PR semanales con la etiqueta `dependencias`. Como los genera un bot, sus commits no llevan `AB#`. Para mantener la trazabilidad, al revisarlos se agrega `AB#24` (análisis de dependencias) en la descripción del PR antes del merge. Deben pasar los mismos checks obligatorios que cualquier PR.
 
 ## Commits
 
@@ -68,3 +72,4 @@ A partir del PR #5 se usará **merge commit**: conserva en `main` cada commit in
 | [#5](https://github.com/EmilioAlonzo4587/arrowops/pull/5) | `feature/documentacion` | AB#32 | — |
 | [#6](https://github.com/EmilioAlonzo4587/arrowops/pull/6) | `feature/azure-pipelines` | AB#20, AB#27, AB#24, AB#28 | — |
 | [#7](https://github.com/EmilioAlonzo4587/arrowops/pull/7) | `fix/pipeline-fallo-controlado` | AB#28 | — |
+| [#8](https://github.com/EmilioAlonzo4587/arrowops/pull/8) | `feature/github-actions` | AB#21, AB#24 | v0.3.0 |

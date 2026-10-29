@@ -69,5 +69,6 @@ Los errores siempre responden con el formato `{ "errors": ["mensaje", ...] }`.
 | Planificación | Azure Boards: Epics, Features, Stories, Tasks y Sprints 1 a 3 | Implementado |
 | Código y revisión | GitHub: ramas `feature/*`, `fix/*`, `refactor/*`, PR y `main` protegida | Implementado |
 | CI | Azure Pipelines: pipeline `ArrowOps-CI` (`azure-pipelines.yml`) en el agente autohospedado `PC-EMILIO` (pool `ArrowOps-SelfHosted`) | Implementado |
-| Checks de PR | GitHub Actions (`.github/workflows/`) | Planificado (Fase 2) |
+| Checks de PR | GitHub Actions, workflow `PR checks` (`.github/workflows/pr-checks.yml`): build y pruebas en Linux con Node 20 y 22, audit de producción y `dependency-review` | Implementado |
+| Actualización de dependencias | Dependabot (`.github/dependabot.yml`): PR semanales para npm y GitHub Actions | Implementado |
 | Release | Artefacto versionado y ambientes `dev` → `prod` con aprobación | Planificado (Fase 3) |

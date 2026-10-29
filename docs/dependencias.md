@@ -18,8 +18,9 @@ Las versiones están fijadas exactamente en `package.json` (`--save-exact`). `pa
 | `npm audit` | Manual, en cada cambio de dependencias | Implementado |
 | `npm audit --omit=dev --audit-level=high` en Azure Pipelines | En cada ejecución; **bloquea** el build si hay vulnerabilidades altas o críticas en producción | Implementado |
 | `npm audit` completo en Azure Pipelines | En cada ejecución; informativo, registra una advertencia | Implementado |
-| Revisión de dependencias en GitHub Actions | En cada PR | Planificado (Fase 2) |
-| Dependabot | Alertas y PR de actualización semanales | Planificado (Fase 2) |
+| `actions/dependency-review-action` en GitHub Actions | En cada PR; **falla** si el PR agrega dependencias con vulnerabilidades moderadas o más graves | Implementado |
+| `npm audit --omit=dev --audit-level=high` en GitHub Actions | En cada PR y push a `main`, con Node 20 y 22 | Implementado |
+| Dependabot | PR semanales (los lunes) para npm y GitHub Actions, con la etiqueta `dependencias` | Implementado |
 
 ## Resultados
 
