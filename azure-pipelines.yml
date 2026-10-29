@@ -67,7 +67,12 @@ stages:
 
           # Informativo: reporte completo, incluidas las de desarrollo (ver docs/dependencias.md).
           # Registra una advertencia en lugar de marcar el paso como fallido.
-          - script: npm audit || echo ##vso[task.logissue type=warning]npm audit reporta vulnerabilidades en dependencias de desarrollo; ver docs/dependencias.md
+          # Bloque literal (|) para que YAML no tome "##vso" como comentario; "call" devuelve
+          # el control a cmd tras npm.cmd y "exit /b 0" evita heredar el codigo de npm audit.
+          - script: |
+              call npm audit
+              if errorlevel 1 echo ##vso[task.logissue type=warning]npm audit reporta vulnerabilidades en dependencias de desarrollo, ver docs/dependencias.md
+              exit /b 0
             displayName: Reporte completo de dependencias (informativo)
 
           - script: npm pack --pack-destination "$(Build.ArtifactStagingDirectory)"
