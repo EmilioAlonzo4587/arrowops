@@ -1,7 +1,8 @@
 const { createApp } = require('./app');
+const { loadConfig } = require('./config');
 
-const PORT = process.env.PORT || 3000;
+const config = loadConfig();
 
-createApp().listen(PORT, () => {
-  console.log(`ArrowOps escuchando en http://localhost:${PORT}`);
+createApp().listen(config.port, () => {
+  console.log(`ArrowOps ${config.appVersion} (${config.nodeEnv}) escuchando en http://localhost:${config.port}`);
 });

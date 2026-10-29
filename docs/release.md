@@ -21,7 +21,7 @@ La versión vive en `package.json` y se marca con un **tag anotado** `vX.Y.Z` so
 | v0.1.0 | API: registrar incidentes (`POST /api/incidents`) | PR #1 | Publicada (tag) |
 | v0.2.0 | CRUD completo e interfaz web | PR #2 a #4 | Publicada (tag) |
 | v0.3.0 | Integración continua: Azure Pipelines en el agente autohospedado, artefacto, GitHub Actions y Dependabot | PR #6 a #8 | Publicada (tag) |
-| v0.4.0 | Calidad y seguridad: pruebas, análisis de dependencias, agente autohospedado | Fase 2 | Planificada |
+| v0.4.0 | Calidad y seguridad: Express 5 y jest 30 (Dependabot), configuración por variables de entorno, 100% de cobertura de líneas con umbral en CI, escaneo de secretos con gitleaks | PR #9 a #14 | Publicada (tag) |
 | v0.4.x | Correcciones (por ejemplo, del fallo controlado o de la deuda técnica) | Fase 2–3 | Planificada |
 | v1.0.0 | Primera versión estable: deuda técnica priorizada resuelta y release a `prod` | Fase 3 | Planificada |
 
