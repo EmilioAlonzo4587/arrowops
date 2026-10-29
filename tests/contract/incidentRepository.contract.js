@@ -52,6 +52,20 @@ function describeIncidentRepositoryContract(name, getRepository) {
       expect(await repo.list({ technicianId: techB.id })).toEqual([]);
     });
 
+    test('list filtra abiertos y sin tecnico', async () => {
+      const nuevo = await repo.create(base);
+      const enProceso = await repo.create(base);
+      await repo.setAssignment(enProceso.id, techA.id, 'EN_PROCESO');
+      const cerrado = await repo.create(base);
+      await repo.setAssignment(cerrado.id, techA.id, 'CERRADO');
+
+      const ids = async (filters) => (await repo.list(filters)).map((i) => i.id).sort();
+      expect(await ids({ open: true })).toEqual([nuevo.id, enProceso.id].sort());
+      expect(await ids({ unassigned: true })).toEqual([nuevo.id]);
+      expect(await ids({ open: true, technicianId: techA.id })).toEqual([enProceso.id]);
+      expect(await ids({ open: false })).toHaveLength(3);
+    });
+
     test('update edita los datos y conserva estado y tecnico', async () => {
       const created = await repo.create({ ...base, reporter: 'noc' });
       await repo.setAssignment(created.id, techA.id, 'ASIGNADO');

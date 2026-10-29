@@ -48,15 +48,39 @@ describe('GET /api/incidents', () => {
     expect(res.body.map((i) => i.title)).toEqual(['B']);
   });
 
+  test('filtra abiertos (NUEVO, ASIGNADO o EN_PROCESO)', async () => {
+    const all = (await request(app).get('/api/incidents')).body;
+    const c = all.find((i) => i.title === 'C');
+    await request(app).patch(`/api/incidents/${c.id}/assign`).send({ technicianId: 1 });
+    for (const status of ['EN_PROCESO', 'RESUELTO']) {
+      await request(app).patch(`/api/incidents/${c.id}/status`).send({ status });
+    }
+
+    const res = await request(app).get('/api/incidents?open=true');
+    expect(res.body.map((i) => i.title).sort()).toEqual(['A', 'B']);
+    expect((await request(app).get('/api/incidents?open=false')).body).toHaveLength(3);
+  });
+
+  test('filtra incidentes sin tecnico con technicianId=none', async () => {
+    const res = await request(app).get('/api/incidents?technicianId=none');
+    expect(res.body.map((i) => i.title).sort()).toEqual(['A', 'C']);
+  });
+
+  test('combina abiertos con prioridad, como la tarjeta de criticos', async () => {
+    const res = await request(app).get('/api/incidents?open=true&priority=critica');
+    expect(res.body.map((i) => i.title)).toEqual(['C']);
+  });
+
   test('combina filtros', async () => {
     const res = await request(app).get('/api/incidents?category=software&status=NUEVO');
     expect(res.body).toEqual([]);
   });
 
   test('rechaza filtros invalidos', async () => {
-    const res = await request(app).get('/api/incidents?status=abierto&priority=urgente&category=x&technicianId=abc');
+    const res = await request(app)
+      .get('/api/incidents?status=abierto&open=si&priority=urgente&category=x&technicianId=abc');
     expect(res.status).toBe(400);
-    expect(res.body.errors).toHaveLength(4);
+    expect(res.body.errors).toHaveLength(5);
   });
 });
 

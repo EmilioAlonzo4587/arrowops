@@ -1,4 +1,5 @@
 const { randomUUID } = require('node:crypto');
+const { OPEN_STATUSES } = require('../models/incident');
 
 // Mismo catalogo inicial que la migracion 002.
 const DEFAULT_TECHNICIANS = ['Ana Lopez', 'Carlos Perez', 'Maria Garcia', 'Jorge Ramirez'];
@@ -46,13 +47,15 @@ function createIncidentRepository() {
       }));
     },
 
-    // Mas recientes primero; filtros opcionales.
-    list({ status, priority, category, technicianId } = {}) {
+    // Mas recientes primero; filtros opcionales. open: solo abiertos; unassigned: solo sin tecnico.
+    list({ status, open, priority, category, technicianId, unassigned } = {}) {
       return [...incidents.values()]
         .filter((i) => !status || i.status === status)
+        .filter((i) => !open || OPEN_STATUSES.includes(i.status))
         .filter((i) => !priority || i.priority === priority)
         .filter((i) => !category || i.category === category)
         .filter((i) => !technicianId || i.technicianId === technicianId)
+        .filter((i) => !unassigned || !i.technicianId)
         .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
         .map((i) => strip(view(i)));
     },

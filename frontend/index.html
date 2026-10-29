@@ -16,12 +16,18 @@
     <section class="panel" id="dashboard-panel">
       <div class="panel-header">
         <h2>Indicadores</h2>
+        <span class="muted">Haz clic en un indicador o en una barra para ver esos incidentes.</span>
       </div>
+      <!-- data-filters: filtros que aplica cada tarjeta a la lista de incidentes. -->
       <div class="cards">
-        <div class="card"><span class="card-value" id="kpi-abiertos">-</span><span class="card-label">Abiertos</span></div>
-        <div class="card card-danger"><span class="card-value" id="kpi-criticos">-</span><span class="card-label">Criticos abiertos</span></div>
-        <div class="card card-ok"><span class="card-value" id="kpi-cerrados">-</span><span class="card-label">Cerrados</span></div>
-        <div class="card"><span class="card-value" id="kpi-total">-</span><span class="card-label">Total</span></div>
+        <button type="button" class="card" data-filters='{"status":"open"}' data-label="Abiertos">
+          <span class="card-value" id="kpi-abiertos">-</span><span class="card-label">Abiertos</span></button>
+        <button type="button" class="card card-danger" data-filters='{"status":"open","priority":"critica"}' data-label="Criticos abiertos">
+          <span class="card-value" id="kpi-criticos">-</span><span class="card-label">Criticos abiertos</span></button>
+        <button type="button" class="card card-ok" data-filters='{"status":"CERRADO"}' data-label="Cerrados">
+          <span class="card-value" id="kpi-cerrados">-</span><span class="card-label">Cerrados</span></button>
+        <button type="button" class="card" data-filters='{}' data-label="Todos">
+          <span class="card-value" id="kpi-total">-</span><span class="card-label">Total</span></button>
       </div>
       <div class="charts">
         <div><h3>Por categoria</h3><div id="chart-categoria" class="bars"></div></div>
@@ -79,6 +85,7 @@
         <label>Estado
           <select id="status-filter" data-filter="status">
             <option value="">Todos</option>
+            <option value="open">Abiertos (sin resolver)</option>
             <option value="NUEVO">Nuevo</option>
             <option value="ASIGNADO">Asignado</option>
             <option value="EN_PROCESO">En proceso</option>
@@ -108,6 +115,7 @@
         <label>Tecnico
           <select id="technician-filter" data-filter="technicianId">
             <option value="">Todos</option>
+            <option value="none">Sin asignar</option>
           </select>
         </label>
         <button type="button" id="clear-filters" class="btn btn-sm">Limpiar filtros</button>

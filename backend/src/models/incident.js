@@ -12,8 +12,10 @@ const TRANSITIONS = {
   CERRADO: [],
 };
 
-// Estados en los que se puede asignar o reasignar un tecnico.
-const ASSIGNABLE_STATUSES = ['NUEVO', 'ASIGNADO', 'EN_PROCESO'];
+// Abiertos: todavia requieren trabajo. Son tambien los estados en los que se puede
+// asignar o reasignar un tecnico.
+const OPEN_STATUSES = ['NUEVO', 'ASIGNADO', 'EN_PROCESO'];
+const ASSIGNABLE_STATUSES = OPEN_STATUSES;
 
 const TITLE_MAX = 120;
 const DESCRIPTION_MAX = 2000;
@@ -114,6 +116,7 @@ function statusAfterAssignment(incident) {
 
 module.exports = {
   STATUSES,
+  OPEN_STATUSES,
   PRIORITIES,
   CATEGORIES,
   TRANSITIONS,

@@ -2,6 +2,12 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); versiones según [Semantic Versioning](https://semver.org/lang/es/).
 
+## [Sin publicar]
+
+### Agregado
+- **Dashboard interactivo (AB#57):** las tarjetas *Abiertos*, *Críticos abiertos*, *Cerrados* y *Total*, y las barras por categoría y por técnico, filtran la lista de incidentes al hacer clic.
+- Filtros `open=true` (incidentes `NUEVO`, `ASIGNADO` o `EN_PROCESO`) y `technicianId=none` (sin técnico) en `GET /api/incidents`, y sus opciones *Abiertos* y *Sin asignar* en la barra de filtros.
+
 ## [2.0.1] - 2026-10-29
 
 ### Corregido

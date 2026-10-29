@@ -1,5 +1,7 @@
 // Repositorio PostgreSQL. Misma interfaz que el repositorio en memoria, pero asincrona.
 // Todas las consultas son parametrizadas ($1, $2...) para evitar inyeccion SQL.
+const { OPEN_STATUSES } = require('../models/incident');
+
 const SELECT_INCIDENT = `
   SELECT i.id, i.title, i.description, i.priority, i.category, i.status, i.reporter,
          i.created_at AS "createdAt", i.updated_at AS "updatedAt",
@@ -69,15 +71,18 @@ function createPostgresIncidentRepository(pool) {
       return findById(rows[0].id);
     },
 
-    async list({ status, priority, category, technicianId } = {}) {
+    async list({ status, open, priority, category, technicianId, unassigned } = {}) {
       const { rows } = await pool.query(
         `${SELECT_INCIDENT}
          WHERE ($1::text IS NULL OR i.status = $1)
            AND ($2::text IS NULL OR i.priority = $2)
            AND ($3::text IS NULL OR i.category = $3)
            AND ($4::int  IS NULL OR i.technician_id = $4)
+           AND ($5::text[] IS NULL OR i.status = ANY($5))
+           AND (NOT $6::boolean OR i.technician_id IS NULL)
          ORDER BY i.created_at DESC`,
-        [status || null, priority || null, category || null, technicianId || null],
+        [status || null, priority || null, category || null, technicianId || null,
+          open ? OPEN_STATUSES : null, Boolean(unassigned)],
       );
       return rows.map(toIncident);
     },
