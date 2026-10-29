@@ -1,8 +1,7 @@
 // Indicadores del dashboard calculados a partir de la lista de incidentes.
 // Funcion pura: la usan ambos repositorios y se prueba sin base de datos.
-const { STATUSES, CATEGORIES } = require('./incident');
+const { STATUSES, CATEGORIES, OPEN_STATUSES } = require('./incident');
 
-const OPEN_STATUSES = ['NUEVO', 'ASIGNADO', 'EN_PROCESO'];
 const UNASSIGNED = 'Sin asignar';
 
 function countBy(items, keyOf, keys = []) {

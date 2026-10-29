@@ -77,7 +77,7 @@ Sin `DATABASE_URL`, la app usa un repositorio en memoria. Ver [database/README.m
 | Método | Ruta | Descripción |
 |---|---|---|
 | `GET` | `/health` | Estado y versión del servicio |
-| `GET` | `/api/incidents?status=&priority=&category=&technicianId=` | Lista de incidentes, con filtros opcionales |
+| `GET` | `/api/incidents?status=&open=&priority=&category=&technicianId=` | Lista de incidentes, con filtros opcionales (`open=true`: abiertos; `technicianId=none`: sin técnico) |
 | `GET` | `/api/incidents/:id` | Detalle de un incidente |
 | `POST` | `/api/incidents` | Crea un incidente (estado `NUEVO`) |
 | `PUT` | `/api/incidents/:id` | Edita los datos de un incidente |

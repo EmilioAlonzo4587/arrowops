@@ -3,18 +3,24 @@
 const dashboard = {
   categoryLabels: { hardware: 'Hardware', software: 'Software', red: 'Red', accesos: 'Accesos', otro: 'Otro' },
 
-  render(stats) {
+  // technicians: catalogo [{id, name}] para convertir el nombre de cada barra en su filtro.
+  render(stats, technicians = []) {
     document.getElementById('kpi-abiertos').textContent = stats.abiertos;
     document.getElementById('kpi-criticos').textContent = stats.criticos;
     document.getElementById('kpi-cerrados').textContent = stats.cerrados;
     document.getElementById('kpi-total').textContent = stats.total;
 
-    this.renderBars('chart-categoria', stats.porCategoria, this.categoryLabels);
-    this.renderBars('chart-tecnico', stats.porTecnico, {});
+    this.renderBars('chart-categoria', stats.porCategoria, this.categoryLabels, (key) => ({ category: key }));
+    // porTecnico cuenta solo abiertos; "Sin asignar" no es un tecnico del catalogo.
+    this.renderBars('chart-tecnico', stats.porTecnico, {}, (name) => {
+      const technician = technicians.find((t) => t.name === name);
+      return { status: 'open', technicianId: technician ? String(technician.id) : 'none' };
+    });
   },
 
   // Barras horizontales proporcionales al valor maximo, ordenadas de mayor a menor.
-  renderBars(containerId, counts, labels) {
+  // Cada barra es un boton con los filtros (filtersOf) que aplica a la lista.
+  renderBars(containerId, counts, labels, filtersOf) {
     const container = document.getElementById(containerId);
     container.replaceChildren();
 
@@ -29,8 +35,11 @@ const dashboard = {
 
     const max = Math.max(...entries.map(([, n]) => n));
     for (const [key, value] of entries) {
-      const row = document.createElement('div');
+      const row = document.createElement('button');
+      row.type = 'button';
       row.className = 'bar-row';
+      row.dataset.filters = JSON.stringify(filtersOf(key));
+      row.dataset.label = `${containerId === 'chart-tecnico' ? 'Abiertos de' : 'Categoria'} ${labels[key] || key}`;
 
       const label = document.createElement('span');
       label.className = 'bar-label';

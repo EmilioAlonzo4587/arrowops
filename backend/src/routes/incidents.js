@@ -24,11 +24,17 @@ function parseTechnicianId(value) {
 function createIncidentsRouter(repository) {
   const router = express.Router();
 
+  // Filtros: status, priority, category, technicianId (id o "none" = sin asignar)
+  // y open=true (NUEVO, ASIGNADO o EN_PROCESO), que usa el dashboard.
   router.get('/', async (req, res) => {
-    const { status, priority, category, technicianId } = req.query;
+    const { status, open, priority, category, technicianId } = req.query;
+    const unassigned = technicianId === 'none';
     const errors = [];
     if (status !== undefined && !STATUSES.includes(status)) {
       errors.push(`status debe ser uno de: ${STATUSES.join(', ')}.`);
+    }
+    if (open !== undefined && open !== 'true' && open !== 'false') {
+      errors.push('open debe ser true o false.');
     }
     if (priority !== undefined && !PRIORITIES.includes(priority)) {
       errors.push(`priority debe ser uno de: ${PRIORITIES.join(', ')}.`);
@@ -36,17 +42,19 @@ function createIncidentsRouter(repository) {
     if (category !== undefined && !CATEGORIES.includes(category)) {
       errors.push(`category debe ser uno de: ${CATEGORIES.join(', ')}.`);
     }
-    if (technicianId !== undefined && !parseTechnicianId(technicianId)) {
-      errors.push('technicianId debe ser un entero positivo.');
+    if (technicianId !== undefined && !unassigned && !parseTechnicianId(technicianId)) {
+      errors.push('technicianId debe ser un entero positivo o none.');
     }
     if (errors.length > 0) {
       return res.status(400).json({ errors });
     }
     return res.json(await repository.list({
       status,
+      open: open === 'true',
       priority,
       category,
-      technicianId: technicianId !== undefined ? parseTechnicianId(technicianId) : undefined,
+      technicianId: technicianId !== undefined && !unassigned ? parseTechnicianId(technicianId) : undefined,
+      unassigned,
     }));
   });
 

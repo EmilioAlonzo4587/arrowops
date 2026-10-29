@@ -100,8 +100,25 @@ function renderIncidents(incidents) {
     </div>`;
 }
 
+// "Abiertos" en el filtro de estado se envia como open=true (NUEVO, ASIGNADO o EN_PROCESO).
 function currentFilters() {
-  return Object.fromEntries(filterEls.map((el) => [el.dataset.filter, el.value]));
+  const filters = Object.fromEntries(filterEls.map((el) => [el.dataset.filter, el.value]));
+  if (filters.status === 'open') {
+    delete filters.status;
+    filters.open = 'true';
+  }
+  return filters;
+}
+
+// Clic en una tarjeta o barra del dashboard: reemplaza los filtros y muestra la lista.
+async function applyDashboardFilter(event) {
+  const target = event.target.closest('[data-filters]');
+  if (!target) return;
+  const filters = JSON.parse(target.dataset.filters);
+  filterEls.forEach((el) => { el.value = filters[el.dataset.filter] || ''; });
+  await loadIncidents();
+  if (Object.keys(filters).length > 0) showMessage(`Mostrando: ${target.dataset.label}.`);
+  listEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 async function loadIncidents() {
@@ -116,7 +133,7 @@ async function loadIncidents() {
 
 async function loadStats() {
   try {
-    dashboard.render(await api.getStats());
+    dashboard.render(await api.getStats(), state.technicians);
   } catch (err) {
     showMessage(`No se pudieron cargar los indicadores: ${err.message}`);
   }
@@ -261,6 +278,7 @@ document.getElementById('clear-filters').addEventListener('click', () => {
   filterEls.forEach((el) => { el.value = ''; });
   loadIncidents();
 });
+document.getElementById('dashboard-panel').addEventListener('click', applyDashboardFilter);
 document.getElementById('detail-close').addEventListener('click', closeDetail);
 commentFormEl.addEventListener('submit', saveComment);
 incidentForm.el.addEventListener('submit', saveIncident);

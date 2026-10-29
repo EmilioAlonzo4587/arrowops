@@ -82,12 +82,14 @@ Cada incidente tiene un historial en la tabla `incident_events`. Se registra aut
 | Por categoría | Todos los incidentes, por `category` |
 | Por técnico | Incidentes **abiertos** por técnico (carga de trabajo), con `Sin asignar` aparte |
 
+Cada indicador es clicable y aplica a la lista el mismo criterio con el que se calculó: *Abiertos* → `open=true`; *Críticos* → `open=true&priority=critica`; *Cerrados* → `status=CERRADO`; una categoría → `category=…`; un técnico → `open=true&technicianId=…` (`none` para *Sin asignar*). Así, el número de la tarjeta coincide con las filas que se muestran.
+
 ## API
 
 | Método | Ruta | Respuestas |
 |---|---|---|
 | `GET` | `/health` | 200 `{ status, version }` |
-| `GET` | `/api/incidents?status=&priority=&category=&technicianId=` | 200, 400 (filtro inválido) |
+| `GET` | `/api/incidents?status=&open=&priority=&category=&technicianId=` | 200, 400 (filtro inválido). `open=true`: NUEVO, ASIGNADO o EN_PROCESO; `technicianId=none`: sin técnico |
 | `GET` | `/api/incidents/:id` | 200, 404 |
 | `POST` | `/api/incidents` | 201 + `Location` (nace `NUEVO`), 400 |
 | `PUT` | `/api/incidents/:id` | 200 (edita los datos; no el estado ni el técnico), 400, 404 |

@@ -113,7 +113,8 @@ select.assign { font-size: 0.85rem; padding: 3px 6px; }
 
 /* Dashboard */
 .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
-.card { border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 4px; border-left: 4px solid var(--accent); }
+.card { border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 4px; border-left: 4px solid var(--accent); background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.card:hover, .card:focus-visible { background: var(--bg); }
 .card-danger { border-left-color: var(--danger); }
 .card-ok { border-left-color: #16a34a; }
 .card-value { font-size: 1.8rem; font-weight: 700; line-height: 1; }
@@ -121,7 +122,8 @@ select.assign { font-size: 0.85rem; padding: 3px 6px; }
 .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .charts h3 { margin: 0 0 10px; font-size: 0.95rem; }
 .bars { display: flex; flex-direction: column; gap: 6px; }
-.bar-row { display: grid; grid-template-columns: 110px 1fr 32px; align-items: center; gap: 8px; font-size: 0.85rem; }
+.bar-row { display: grid; grid-template-columns: 110px 1fr 32px; align-items: center; gap: 8px; font-size: 0.85rem; width: 100%; padding: 2px 4px; border: 0; border-radius: 6px; background: none; font-family: inherit; color: inherit; text-align: left; cursor: pointer; }
+.bar-row:hover, .bar-row:focus-visible { background: var(--bg); }
 .bar-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bar-track { background: #eef2f7; border-radius: 999px; height: 10px; overflow: hidden; }
 .bar-fill { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
