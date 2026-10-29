@@ -15,6 +15,39 @@ ArrowOps es una solución web para registrar, dar seguimiento y cerrar incidente
 | `.github/workflows/` | GitHub Actions |
 | `azure-pipelines.yml` | Pipeline de CI/CD en Azure Pipelines |
 
+## Levantar todo el proyecto con Docker (recomendado)
+
+Requisitos: [Docker Desktop](https://www.docker.com/products/docker-desktop/) (o Docker Engine con Compose v2) y Git.
+
+```bash
+git clone https://github.com/EmilioAlonzo4587/arrowops.git
+cd arrowops
+cp .env.example .env          # Windows PowerShell: Copy-Item .env.example .env
+```
+
+Edita `.env` y escribe cualquier contraseña en `POSTGRES_PASSWORD` (por ejemplo, `POSTGRES_PASSWORD=mi-clave`). Después:
+
+```bash
+docker compose up -d --build
+```
+
+Abre **http://localhost:3000**. Se levantan dos contenedores:
+
+| Servicio | Qué es |
+|---|---|
+| `app` | ArrowOps: API y frontend, construidos desde el código |
+| `db` | PostgreSQL 17 con el esquema y 4 incidentes de ejemplo |
+
+| Acción | Comando |
+|---|---|
+| Ver el estado | `docker compose ps` |
+| Ver los logs | `docker compose logs -f app` |
+| Detener | `docker compose down` |
+| Detener y borrar los datos | `docker compose down -v` |
+| Usar otro puerto | `APP_PORT=8090` en `.env` |
+
+La contraseña no está en el repositorio: se lee de `.env`, que git ignora. Si falta, Docker lo avisa con un mensaje claro.
+
 ## Ejecutar en local
 
 Requisitos: Node.js 20 o superior.

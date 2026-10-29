@@ -30,6 +30,8 @@ La versión vive en `package.json` y se marca con un **tag anotado** `vX.Y.Z` so
 
 Para desplegarlo, el pipeline construye una **imagen Docker a partir del mismo `.tgz`** (`devops/deploy/Dockerfile`): se despliega exactamente lo que pasó las pruebas, sin volver a compilar desde el código. La imagen usa `node:22-alpine`, instala solo las dependencias de producción, corre como usuario `node` (no root) e incluye un `HEALTHCHECK`.
 
+Para evaluar el proyecto completo sin pipeline, el `docker-compose.yml` de la raíz construye la imagen desde el código con el **mismo empaquetado** (`npm pack` → instalar solo dependencias de producción) y levanta PostgreSQL (ver `README.md`).
+
 Para instalarlo en un servidor:
 
 ```bash
