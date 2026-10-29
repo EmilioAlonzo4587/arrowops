@@ -119,6 +119,9 @@ stages:
       - deployment: deploy_dev
         displayName: arrowops-dev (http://localhost:8081)
         environment: arrowops-dev
+        # Workspace limpio en cada despliegue: sin artefactos de ejecuciones anteriores (F-04).
+        workspace:
+          clean: all
         strategy:
           runOnce:
             deploy:
@@ -139,6 +142,8 @@ stages:
       - deployment: deploy_prod
         displayName: arrowops-prod (http://localhost:8080)
         environment: arrowops-prod
+        workspace:
+          clean: all
         strategy:
           runOnce:
             deploy:

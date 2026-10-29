@@ -16,23 +16,37 @@ steps:
     artifact: arrowops
     displayName: Descargar artefacto del CI
 
+  # Debe haber exactamente un artefacto: el workspace del agente autohospedado puede
+  # conservar archivos de ejecuciones anteriores (fallo F-04). En los tags, la version
+  # del artefacto tiene que coincidir con la del tag.
   - powershell: |
-      $tgz = Get-ChildItem "$(Pipeline.Workspace)/arrowops/arrowops-*.tgz" | Select-Object -First 1
-      $version = $tgz.BaseName -replace '^arrowops-', ''
-      Write-Host "Artefacto: $($tgz.Name) -> version $version"
+      $tgz = @(Get-ChildItem "$(Pipeline.Workspace)/arrowops/arrowops-*.tgz")
+      if ($tgz.Count -ne 1) {
+        Write-Host "##vso[task.logissue type=error]Se esperaba 1 artefacto y hay $($tgz.Count): $($tgz.Name -join ', ')"
+        exit 1
+      }
+      $version = $tgz[0].BaseName -replace '^arrowops-', ''
+      $ref = '$(Build.SourceBranch)'
+      if ($ref -like 'refs/tags/v*' -and $version -ne $ref.Substring(11)) {
+        Write-Host "##vso[task.logissue type=error]El artefacto es $version pero el tag es $($ref.Substring(10))"
+        exit 1
+      }
+      $imageTag = "$version-$(Build.BuildId)"
+      Write-Host "Artefacto: $($tgz[0].Name) -> version $version, imagen arrowops:$imageTag"
       Write-Host "##vso[task.setvariable variable=APP_VERSION]$version"
-    displayName: Resolver version del artefacto
+      Write-Host "##vso[task.setvariable variable=APP_IMAGE_TAG]$imageTag"
+    displayName: Resolver y verificar version del artefacto
 
-  - script: docker build -f devops/deploy/Dockerfile -t arrowops:$(APP_VERSION) "$(Pipeline.Workspace)/arrowops"
-    displayName: Construir imagen arrowops:$(APP_VERSION) desde el artefacto
+  # Etiqueta inmutable por ejecucion (version-build): dos builds distintos nunca comparten imagen.
+  - script: docker build -f devops/deploy/Dockerfile -t arrowops:$(APP_IMAGE_TAG) "$(Pipeline.Workspace)/arrowops"
+    displayName: Construir imagen arrowops:$(APP_IMAGE_TAG) desde el artefacto
 
   - script: docker compose -p ${{ parameters.project }} -f devops/deploy/docker-compose.yml up -d --wait
     displayName: Desplegar ${{ parameters.project }} (puerto ${{ parameters.port }})
     env:
-      APP_VERSION: $(APP_VERSION)
+      APP_IMAGE_TAG: $(APP_IMAGE_TAG)
       APP_PORT: ${{ parameters.port }}
       POSTGRES_PASSWORD: ${{ parameters.postgresPassword }}
-
   # Validacion posterior al despliegue: la app responde y corre la version esperada.
   - powershell: |
       $url = "http://localhost:${{ parameters.port }}/health"
