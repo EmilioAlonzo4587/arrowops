@@ -1,10 +1,12 @@
 const express = require('express');
 const { STATUSES, PRIORITIES, validateIncident } = require('../models/incident');
 
+// Los handlers son async: el repositorio puede ser en memoria (sincrono) o PostgreSQL.
+// Express 5 envia las promesas rechazadas al manejador de errores (500) sin try/catch.
 function createIncidentsRouter(repository) {
   const router = express.Router();
 
-  router.get('/', (req, res) => {
+  router.get('/', async (req, res) => {
     const { status, priority } = req.query;
     const errors = [];
     if (status !== undefined && !STATUSES.includes(status)) {
@@ -16,40 +18,40 @@ function createIncidentsRouter(repository) {
     if (errors.length > 0) {
       return res.status(400).json({ errors });
     }
-    return res.json(repository.list({ status, priority }));
+    return res.json(await repository.list({ status, priority }));
   });
 
-  router.get('/:id', (req, res) => {
-    const incident = repository.findById(req.params.id);
+  router.get('/:id', async (req, res) => {
+    const incident = await repository.findById(req.params.id);
     if (!incident) {
       return res.status(404).json({ errors: ['Incidente no encontrado.'] });
     }
     return res.json(incident);
   });
 
-  router.post('/', (req, res) => {
+  router.post('/', async (req, res) => {
     const errors = validateIncident(req.body);
     if (errors.length > 0) {
       return res.status(400).json({ errors });
     }
-    const incident = repository.create(req.body);
+    const incident = await repository.create(req.body);
     return res.status(201).location(`/api/incidents/${incident.id}`).json(incident);
   });
 
-  router.put('/:id', (req, res) => {
+  router.put('/:id', async (req, res) => {
     const errors = validateIncident(req.body);
     if (errors.length > 0) {
       return res.status(400).json({ errors });
     }
-    const incident = repository.update(req.params.id, req.body);
+    const incident = await repository.update(req.params.id, req.body);
     if (!incident) {
       return res.status(404).json({ errors: ['Incidente no encontrado.'] });
     }
     return res.json(incident);
   });
 
-  router.delete('/:id', (req, res) => {
-    if (!repository.remove(req.params.id)) {
+  router.delete('/:id', async (req, res) => {
+    if (!(await repository.remove(req.params.id))) {
       return res.status(404).json({ errors: ['Incidente no encontrado.'] });
     }
     return res.status(204).end();
