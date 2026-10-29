@@ -33,6 +33,25 @@ function createPostgresIncidentRepository(pool) {
     return rows[0] ? findById(rows[0].id) : null;
   }
 
+  async function listEvents(incidentId) {
+    if (!UUID_PATTERN.test(incidentId)) return [];
+    const { rows } = await pool.query(
+      `SELECT e.id, e.type, e.author, e.message, e.from_status AS "fromStatus", e.to_status AS "toStatus",
+              e.created_at AS "createdAt", t.id AS "technicianId", t.name AS "technicianName"
+       FROM incident_events e
+       LEFT JOIN technicians t ON t.id = e.technician_id
+       WHERE e.incident_id = $1
+       ORDER BY e.created_at, e.id`,
+      [incidentId],
+    );
+    return rows.map(({ technicianId, technicianName, ...e }) => ({
+      ...e,
+      id: Number(e.id),
+      technician: technicianId ? { id: technicianId, name: technicianName } : null,
+      createdAt: e.createdAt.toISOString(),
+    }));
+  }
+
   return {
     async create(data) {
       const { rows } = await pool.query(
@@ -102,6 +121,19 @@ function createPostgresIncidentRepository(pool) {
       const { rowCount } = await pool.query('DELETE FROM incidents WHERE id = $1', [id]);
       return rowCount > 0;
     },
+
+    async addEvent(incidentId, { type, author = null, message = null, fromStatus = null, toStatus = null, technicianId = null }) {
+      const { rows } = await pool.query(
+        `INSERT INTO incident_events (incident_id, type, author, message, from_status, to_status, technician_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         RETURNING id`,
+        [incidentId, type, author, message, fromStatus, toStatus, technicianId],
+      );
+      const events = await listEvents(incidentId);
+      return events.find((e) => e.id === Number(rows[0].id));
+    },
+
+    listEvents,
 
     async listTechnicians() {
       const { rows } = await pool.query('SELECT id, name FROM technicians WHERE active ORDER BY name');

@@ -1,7 +1,7 @@
 const path = require('node:path');
 const express = require('express');
 const { createIncidentRepository } = require('./repositories/incidentRepository');
-const { createIncidentsRouter, createTechniciansRouter } = require('./routes/incidents');
+const { createIncidentsRouter, createTechniciansRouter, createStatsRouter } = require('./routes/incidents');
 const { STATUSES, PRIORITIES, CATEGORIES, TRANSITIONS } = require('./models/incident');
 const { version: packageVersion } = require('../../package.json');
 
@@ -14,6 +14,7 @@ function createApp({ repository = createIncidentRepository(), version = packageV
   app.get('/health', (req, res) => res.json({ status: 'ok', version }));
   app.use('/api/incidents', createIncidentsRouter(repository));
   app.use('/api/technicians', createTechniciansRouter(repository));
+  app.use('/api/stats', createStatsRouter(repository));
   // Catalogos y flujo de estados: la interfaz los toma de aqui en vez de duplicar las reglas.
   app.get('/api/meta', (req, res) => res.json({ statuses: STATUSES, priorities: PRIORITIES, categories: CATEGORIES, transitions: TRANSITIONS }));
   app.use(express.static(path.join(__dirname, '..', '..', 'frontend')));
