@@ -1,7 +1,7 @@
 // Lectura, validacion y llenado del formulario de incidentes.
 const incidentForm = {
   el: document.getElementById('incident-form'),
-  fields: ['title', 'description', 'priority', 'status', 'reporter'],
+  fields: ['title', 'description', 'priority', 'category', 'reporter'],
 
   read() {
     const data = {};
