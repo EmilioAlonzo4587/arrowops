@@ -6,6 +6,7 @@ const validIncident = {
   title: 'Impresora del piso 2 sin conexion',
   description: 'La impresora no responde desde la red interna.',
   priority: 'media',
+  category: 'hardware',
   reporter: 'mesa.ayuda',
 };
 
@@ -14,17 +15,13 @@ describe('validateIncident', () => {
     expect(validateIncident(validIncident)).toEqual([]);
   });
 
-  test('exige title, description y priority', () => {
-    const errors = validateIncident({});
-    expect(errors).toHaveLength(3);
+  test('exige title, description, priority y category', () => {
+    expect(validateIncident({})).toHaveLength(4);
   });
 
-  test('rechaza prioridad y estado desconocidos', () => {
-    const errors = validateIncident({ ...validIncident, priority: 'urgente', status: 'perdido' });
-    expect(errors).toEqual([
-      expect.stringContaining('priority'),
-      expect.stringContaining('status'),
-    ]);
+  test('rechaza prioridad y categoria desconocidas', () => {
+    const errors = validateIncident({ ...validIncident, priority: 'urgente', category: 'impresoras' });
+    expect(errors).toEqual([expect.stringContaining('priority'), expect.stringContaining('category')]);
   });
 
   // Contrato del limite: debe coincidir con maxlength="120" de frontend/index.html (ver F-02).
@@ -45,18 +42,28 @@ describe('POST /api/incidents', () => {
     app = createApp();
   });
 
-  test('crea un incidente y responde 201', async () => {
+  test('crea un incidente NUEVO, sin tecnico, y responde 201', async () => {
     const res = await request(app).post('/api/incidents').send(validIncident);
 
     expect(res.status).toBe(201);
     expect(res.body).toMatchObject({
       title: validIncident.title,
       priority: 'media',
-      status: 'abierto',
+      category: 'hardware',
+      status: 'NUEVO',
+      technician: null,
       reporter: 'mesa.ayuda',
     });
     expect(res.body.id).toBeDefined();
+    expect(res.body.createdAt).toBeDefined();
     expect(res.headers.location).toBe(`/api/incidents/${res.body.id}`);
+  });
+
+  test('ignora status y tecnico enviados en el alta', async () => {
+    const res = await request(app)
+      .post('/api/incidents')
+      .send({ ...validIncident, status: 'CERRADO', technicianId: 1 });
+    expect(res.body).toMatchObject({ status: 'NUEVO', technician: null });
   });
 
   test('responde 400 con los errores de validacion', async () => {
@@ -78,7 +85,7 @@ describe('POST /api/incidents', () => {
 });
 
 describe('GET /health', () => {
-  test('responde ok', async () => {
+  test('responde ok con la version', async () => {
     const res = await request(createApp()).get('/health');
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ status: 'ok', version: require('../../package.json').version });

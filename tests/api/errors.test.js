@@ -7,6 +7,7 @@ const base = {
   title: 'Servidor de archivos lento',
   description: 'Las copias tardan mas de 10 minutos.',
   priority: 'alta',
+  category: 'hardware',
 };
 
 describe('validaciones adicionales', () => {
@@ -55,18 +56,26 @@ describe('manejo de errores de la app', () => {
   });
 });
 
-describe('repositorio', () => {
-  test('update quita el reporter si no se envia y conserva el estado', () => {
+describe('repositorio en memoria', () => {
+  test('update quita el reporter si no se envia y conserva estado y tecnico', () => {
     const repo = createIncidentRepository();
-    const created = repo.create({ ...base, reporter: ' soporte ', status: 'en_progreso' });
+    const created = repo.create({ ...base, reporter: ' soporte ' });
     expect(created.reporter).toBe('soporte');
+    repo.setAssignment(created.id, 1, 'ASIGNADO');
 
     const updated = repo.update(created.id, base);
     expect(updated.reporter).toBeNull();
-    expect(updated.status).toBe('en_progreso');
+    expect(updated).toMatchObject({ status: 'ASIGNADO', technician: { id: 1 } });
   });
 
-  test('update devuelve null si el incidente no existe', () => {
-    expect(createIncidentRepository().update('no-existe', base)).toBeNull();
+  test('las operaciones devuelven null si el incidente no existe', () => {
+    const repo = createIncidentRepository();
+    expect(repo.update('no-existe', base)).toBeNull();
+    expect(repo.setAssignment('no-existe', 1, 'ASIGNADO')).toBeNull();
+    expect(repo.setStatus('no-existe', 'EN_PROCESO')).toBeNull();
+  });
+
+  test('findTechnician devuelve null si no existe', () => {
+    expect(createIncidentRepository().findTechnician(999)).toBeNull();
   });
 });
