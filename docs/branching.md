@@ -84,3 +84,4 @@ A partir del PR #5 se usará **merge commit**: conserva en `main` cada commit in
 | [#21](https://github.com/EmilioAlonzo4587/arrowops/pull/21) | `feature/v2-bitacora-dashboard` | AB#49 a AB#54 | (v2.0.0) |
 | [#22](https://github.com/EmilioAlonzo4587/arrowops/pull/22) | `feature/release-v2` | AB#55 | v2.0.0 (no desplegada a prod) |
 | [#23](https://github.com/EmilioAlonzo4587/arrowops/pull/23) | `fix/despliegue-artefacto-obsoleto` | AB#56 (Bug) | **v2.0.1** |
+| [#24](https://github.com/EmilioAlonzo4587/arrowops/pull/24) | `feature/evidencias-release-v2` | AB#55 | — |

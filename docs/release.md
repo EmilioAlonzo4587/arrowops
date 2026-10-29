@@ -24,7 +24,7 @@ La versión vive en `package.json` y se marca con un **tag anotado** `vX.Y.Z` so
 | v0.4.0 | Calidad y seguridad: Express 5 y jest 30 (Dependabot), configuración por variables de entorno, 100% de cobertura de líneas con umbral en CI, escaneo de secretos con gitleaks | PR #9 a #14 | Publicada (tag) |
 | v1.0.0 | **Primera versión estable:** persistencia en PostgreSQL (TD-01), finales de línea normalizados (TD-02), ambientes `dev` y `prod` en Docker con aprobación manual y GitHub Release | PR #15 a #17 | **Publicada** (tag + GitHub Release, desplegada en `prod`) |
 | v2.0.0 | **MAJOR:** alcance funcional completo (categoría, técnicos, flujo de estados, bitácora, filtros y dashboard). Cambio incompatible en los estados, con migración automática de datos (ver [changelog.md](changelog.md)) | PR #19 a #22 | Tag publicado; **no desplegada a prod** (aprobación rechazada, F-04) |
-| v2.0.1 | **PATCH:** corrección del despliegue (F-04): workspace limpio, verificación de versión e imágenes inmutables. Primera 2.x en producción | PR #23 | Ver checklist v2.0.0 / v2.0.1 |
+| v2.0.1 | **PATCH:** corrección del despliegue (F-04): workspace limpio, verificación de versión e imágenes inmutables. Primera 2.x en producción | PR #23 | **Publicada** (tag + GitHub Release, desplegada en `prod`) |
 
 ## Artefacto
 
@@ -117,9 +117,11 @@ Estado final de los ambientes (contenedores en el agente `PC-EMILIO`):
 - [x] **Despliegue continuo a `dev`** validado antes del tag: cada merge a `main` desplegó a dev y aplicó las migraciones `002` y `003`.
 - [x] Tag `v2.0.0` → CI → `dev` → aprobación: **rechazada**. Dev reportaba 1.0.0 por un artefacto obsoleto (F-04); prod no se tocó.
 - [x] Corrección en el PR #23 (Bug AB#56) y versión **2.0.1**.
-- [ ] Tag `v2.0.1` → CI → `dev` (verificar `version 2.0.1`) → **aprobación manual** → `prod`.
-- [ ] Datos de `prod` convertidos sin pérdida (incidente v1 `abierto` → `NUEVO`).
-- [ ] GitHub Release v2.0.1 con `arrowops-2.0.1.tgz`.
-- [ ] Work Items del alcance (Feature AB#42) en `Closed`.
+- [x] Tag `v2.0.1` → CI → `dev` → **aprobación manual** → `prod`: ejecución [#20261029.51](https://dev.azure.com/devopsArrow/ArrowOps/_build/results?buildId=60) (build 60). Dev se verificó **antes de aprobar**: un solo artefacto (`arrowops-2.0.1.tgz`), imagen `arrowops:2.0.1-60` y `/health` con `version 2.0.1`. Prod: `Health check OK: http://localhost:8080/health -> version 2.0.1`.
+- [x] Datos de `prod` convertidos sin pérdida. Al arrancar se aplicaron las migraciones `001`, `002` y `003`. El incidente `5543c5ba` (*Reporte de señal*) conservó su id y pasó de `abierto` a `NUEVO`, con categoría `otro` y su evento `creado` en la bitácora con la fecha original.
+- [x] [GitHub Release v2.0.1](https://github.com/EmilioAlonzo4587/arrowops/releases/tag/v2.0.1) con `arrowops-2.0.1.tgz` (el mismo artefacto de la ejecución 60, con su SHA-256 en las notas).
+- [x] Work Items en `Closed`: Feature AB#42, Stories AB#43, 46, 49 y 52, Tasks AB#44 a AB#55, Bug AB#56 y Epic AB#2.
+
+Dónde verificar cada evidencia, incluido el rechazo de la v2.0.0: [evidencias/](evidencias/README.md).
 
 **Por qué es un cambio MAJOR:** los valores de estado y el contrato de `POST`/`PUT` cambian de forma incompatible para los clientes de la API v1. SemVer exige incrementar `MAJOR` aunque los datos se migren automáticamente.
