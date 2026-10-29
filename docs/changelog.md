@@ -2,6 +2,28 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); versiones según [Semantic Versioning](https://semver.org/lang/es/).
 
+## [2.0.0] - 2026-10-29
+
+Alcance funcional completo: operación, seguimiento, consulta e indicadores.
+
+### ⚠️ Cambios incompatibles
+- **Estados nuevos:** `NUEVO`, `ASIGNADO`, `EN_PROCESO`, `RESUELTO` y `CERRADO` reemplazan a `abierto`, `en_progreso`, `resuelto` y `cerrado`. Los valores de v1 responden 400.
+- **`category` es obligatoria** en `POST` y `PUT` (`hardware`, `software`, `red`, `accesos`, `otro`).
+- **El estado ya no se fija al crear ni con `PUT`:** todo incidente nace `NUEVO` y cambia solo con `PATCH /status` y `PATCH /assign`, respetando el flujo.
+
+### Guía de migración desde v1.x
+- **Datos:** no requieren acción. Al arrancar, la app aplica las migraciones `002` y `003`. Convierten `abierto` → `NUEVO`, `en_progreso` → `EN_PROCESO`, `resuelto` → `RESUELTO` y `cerrado` → `CERRADO`; asignan la categoría `otro` y crean el evento `creado` en la bitácora de cada incidente. Ningún incidente se pierde.
+- **Clientes de la API:** enviar `category`; usar los estados nuevos en los filtros; reemplazar el cambio de estado por `PUT` por `PATCH /api/incidents/:id/status`, y la asignación por `PATCH /api/incidents/:id/assign`.
+
+### Agregado
+- Categoría del incidente y catálogo de técnicos (`GET /api/technicians`).
+- Asignación y reasignación de técnico; cambio de estado con transiciones válidas (409 si se intenta un salto inválido) (PR #20).
+- Bitácora: eventos automáticos (creado, editado, asignado, cambio de estado) y comentarios, con historial visible por incidente (PR #21).
+- Filtros por estado, prioridad, categoría y técnico, en la API y en la interfaz.
+- Dashboard (`GET /api/stats`): abiertos, cerrados, críticos y distribución por categoría y técnico.
+- `GET /api/meta`: catálogos y flujo de estados para la interfaz.
+- Migraciones versionadas de base de datos, aplicadas al arrancar (`database/migrations/`).
+- `docker-compose.yml` en la raíz para levantar todo el proyecto con un comando (PR #19).
 ## [1.0.0] - 2026-10-29
 
 Primera versión estable.
@@ -46,6 +68,7 @@ Primera versión estable.
 ### Agregado
 - API para registrar incidentes (`POST /api/incidents`) con validaciones y `GET /health`.
 
+[2.0.0]: https://github.com/EmilioAlonzo4587/arrowops/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/EmilioAlonzo4587/arrowops/compare/v0.4.0...v1.0.0
 [0.4.0]: https://github.com/EmilioAlonzo4587/arrowops/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/EmilioAlonzo4587/arrowops/compare/v0.2.0...v0.3.0
