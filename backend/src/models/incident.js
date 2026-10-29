@@ -1,7 +1,7 @@
 const STATUSES = ['abierto', 'en_progreso', 'resuelto', 'cerrado'];
 const PRIORITIES = ['baja', 'media', 'alta', 'critica'];
 
-const TITLE_MAX = 120;
+const TITLE_MAX = 100;
 const DESCRIPTION_MAX = 2000;
 
 // Devuelve la lista de errores de validacion; vacia si el incidente es valido.
