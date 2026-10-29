@@ -25,7 +25,7 @@ flowchart LR
 | Modelo | `backend/src/models/incident.js` | Estados y prioridades válidos; `validateIncident()` |
 | Repositorio PostgreSQL | `backend/src/repositories/postgresIncidentRepository.js` | Persistencia real con consultas parametrizadas (asíncrono) |
 | Repositorio en memoria | `backend/src/repositories/incidentRepository.js` | Misma interfaz sobre un `Map`; se usa sin `DATABASE_URL` (desarrollo rápido y pruebas unitarias) |
-| Frontend | `frontend/` | `index.html`, `src/api.js` (cliente HTTP), `src/form.js` (formulario), `src/app.js` (tabla y eventos) |
+| Frontend | `frontend/` | `index.html`, `src/api.js` (cliente HTTP), `src/form.js` (formulario), `src/dashboard.js` (indicadores), `src/app.js` (filtros, tabla, operaciones e historial) |
 | Pruebas | `tests/api/`, `tests/contract/` | Jest + Supertest. Las **pruebas de contrato** corren la misma batería contra los dos repositorios; las de PostgreSQL se ejecutan si hay `DATABASE_URL` (siempre en CI) |
 | Ejecución completa | `docker-compose.yml` y `Dockerfile` (raíz) | Un `docker compose up` levanta la app (construida desde el código con el mismo empaquetado del CI) y PostgreSQL con esquema y datos de ejemplo |
 | Base de datos | `database/` | `docker-compose.yml` (PostgreSQL 17, puerto 5433), `schema.sql` (tabla `incidents` con restricciones e índices) y `seed.sql` |
@@ -66,6 +66,22 @@ Las reglas están en `backend/src/models/incident.js`:
 
 Una transición inválida responde **409 Conflict** con un mensaje que indica qué está permitido.
 
+### Bitácora (seguimiento)
+
+Cada incidente tiene un historial en la tabla `incident_events`. Se registra automáticamente cada vez que el incidente se **crea**, se **edita**, se **asigna o reasigna** y **cambia de estado** (con el estado anterior y el nuevo). Además admite **comentarios** manuales. Las operaciones aceptan un `author` opcional y las que se rechazan no quedan registradas. Al eliminar un incidente se elimina su historial (`ON DELETE CASCADE`).
+
+### Indicadores (dashboard)
+
+`backend/src/models/stats.js` calcula los indicadores con una función pura, la misma para los dos módulos de datos:
+
+| Indicador | Definición |
+|---|---|
+| Abiertos | `NUEVO` + `ASIGNADO` + `EN_PROCESO` (todavía requieren trabajo) |
+| Cerrados | `CERRADO` |
+| Críticos | Prioridad `critica` y todavía abiertos |
+| Por categoría | Todos los incidentes, por `category` |
+| Por técnico | Incidentes **abiertos** por técnico (carga de trabajo), con `Sin asignar` aparte |
+
 ## API
 
 | Método | Ruta | Respuestas |
@@ -78,6 +94,9 @@ Una transición inválida responde **409 Conflict** con un mensaje que indica qu
 | `PATCH` | `/api/incidents/:id/assign` `{ technicianId }` | 200, 400, 404, 409 |
 | `PATCH` | `/api/incidents/:id/status` `{ status }` | 200, 400, 404, 409 |
 | `DELETE` | `/api/incidents/:id` | 204, 404 |
+| `GET` | `/api/incidents/:id/history` | 200 (bitácora en orden cronológico), 404 |
+| `POST` | `/api/incidents/:id/comments` `{ message, author? }` | 201, 400, 404 |
+| `GET` | `/api/stats` | 200: `total`, `abiertos`, `resueltos`, `cerrados`, `criticos`, `porEstado`, `porCategoria` y `porTecnico` |
 | `GET` | `/api/technicians` | 200 (técnicos activos) |
 | `GET` | `/api/meta` | 200: estados, prioridades, categorías y transiciones. La interfaz los toma de aquí para no duplicar las reglas |
 

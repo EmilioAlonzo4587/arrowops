@@ -11,7 +11,7 @@ Se usa **GitHub Flow** con ramas de vida corta y una sola rama permanente, `main
 | `fix/<descripcion>` | Corrección de errores | `fix/pipeline-fallo-controlado` |
 | `refactor/<descripcion>` | Pago de deuda técnica sin cambiar el comportamiento | `refactor/normalizar-finales-linea` |
 
-Las ramas salen de `main` actualizada y se borran después del merge.
+Las ramas salen de `main` actualizada. GitHub **borra automáticamente** la rama de cada PR al hacer el merge (*Automatically delete head branches*, activado desde el PR #20).
 
 ## Protección de `main`
 
@@ -81,3 +81,4 @@ A partir del PR #5 se usará **merge commit**: conserva en `main` cada commit in
 | [#18](https://github.com/EmilioAlonzo4587/arrowops/pull/18) | `feature/cierre-release-v1` | AB#31 | — |
 | [#19](https://github.com/EmilioAlonzo4587/arrowops/pull/19) | `feature/docker-compose-proyecto` | AB#41 | — |
 | [#20](https://github.com/EmilioAlonzo4587/arrowops/pull/20) | `feature/v2-modelo-operacion` | AB#43 a AB#48 | (v2.0.0) |
+| [#21](https://github.com/EmilioAlonzo4587/arrowops/pull/21) | `feature/v2-bitacora-dashboard` | AB#49 a AB#54 | (v2.0.0) |

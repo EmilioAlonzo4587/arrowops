@@ -82,6 +82,9 @@ Sin `DATABASE_URL`, la app usa un repositorio en memoria. Ver [database/README.m
 | `PATCH` | `/api/incidents/:id/assign` | Asigna un técnico (`NUEVO` pasa a `ASIGNADO`) |
 | `PATCH` | `/api/incidents/:id/status` | Cambia el estado según el flujo |
 | `DELETE` | `/api/incidents/:id` | Elimina un incidente |
+| `GET` | `/api/incidents/:id/history` | Bitácora del incidente |
+| `POST` | `/api/incidents/:id/comments` | Agrega un comentario |
+| `GET` | `/api/stats` | Indicadores del dashboard |
 | `GET` | `/api/technicians` | Catálogo de técnicos |
 | `GET` | `/api/meta` | Estados, prioridades, categorías y transiciones |
 

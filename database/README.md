@@ -6,6 +6,7 @@ ArrowOps usa **PostgreSQL 17** en Docker.
 |---|---|
 | `migrations/001_incidents.sql` | Esquema inicial de v1.0.0: tabla `incidents` |
 | `migrations/002_categoria_tecnicos_estados.sql` | v2.0.0: catálogo `technicians`, columnas `category` y `technician_id`, y conversión de los estados v1 a `NUEVO`, `ASIGNADO`, `EN_PROCESO`, `RESUELTO` y `CERRADO` |
+| `migrations/003_bitacora.sql` | v2.0.0: tabla `incident_events` (bitácora) con el evento `creado` de los incidentes existentes |
 | `seed.sql` | Datos de ejemplo. La app los carga solo si `SEED_DEMO_DATA=true` y la tabla está vacía |
 | `docker-compose.yml` | PostgreSQL para desarrollo local, en el puerto **5433** del host |
 
