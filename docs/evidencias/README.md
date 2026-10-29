@@ -9,8 +9,8 @@ Registro de dónde se puede verificar cada requisito. Las capturas de pantalla d
 | Azure Pipelines y agente autohospedado | Etapas CI, `Deploy_dev` y `Deploy_prod` en el agente `PC-EMILIO` | Azure DevOps → Pipelines → `ArrowOps-CI` |
 | Fallos con diagnóstico | F-01 (YAML y `uuid`), F-02 (fallo provocado), F-03 (Dependency graph) y F-04 (artefacto obsoleto) | [../fallos-pipeline.md](../fallos-pipeline.md) |
 | Dependencias | Audits, Dependabot (PR #9 a #13) y decisiones | [../dependencias.md](../dependencias.md) |
-| Aprobación de producción | v1.0.0 aprobada (build 46), **v2.0.0 rechazada** (build 57, F-04) y v2.0.1 aprobada (build 60) | Azure DevOps → Pipelines → Environments → `arrowops-prod` → historial de despliegues y aprobaciones |
-| Releases y artefactos | `v1.0.0` y `v2.0.1` con su `.tgz` y SHA-256 | GitHub → Releases |
+| Aprobación de producción | v1.0.0 aprobada (build 46), **v2.0.0 rechazada** (build 57, F-04), v2.0.1 aprobada (build 60) y v2.1.0 aprobada (build 70) | Azure DevOps → Pipelines → Environments → `arrowops-prod` → historial de despliegues y aprobaciones |
+| Releases y artefactos | `v1.0.0`, `v2.0.1` y `v2.1.0` con su `.tgz` y SHA-256 | GitHub → Releases |
 | Migración de datos en producción | Incidente v1 conservado (`abierto` → `NUEVO`) | [../release.md](../release.md), checklist v2.0.1 |
 
 ## Capturas entregadas aparte

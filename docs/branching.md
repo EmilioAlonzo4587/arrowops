@@ -88,3 +88,4 @@ A partir del PR #5 se usará **merge commit**: conserva en `main` cada commit in
 | [#25](https://github.com/EmilioAlonzo4587/arrowops/pull/25) | `feature/dashboard-interactivo` | AB#57 | (v2.1.0) |
 | [#26](https://github.com/EmilioAlonzo4587/arrowops/pull/26) | `feature/interfaz-tecnica` | AB#58 | (v2.1.0) |
 | [#27](https://github.com/EmilioAlonzo4587/arrowops/pull/27) | `feature/release-v2.1.0` | AB#59 | **v2.1.0** |
+| [#28](https://github.com/EmilioAlonzo4587/arrowops/pull/28) | `feature/cierre-release-v2.1.0` | AB#59 | — |
