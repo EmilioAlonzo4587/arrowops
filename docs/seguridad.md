@@ -16,7 +16,8 @@ Controles preventivos:
 - `.gitignore` excluye `.env`, `.env.*` (menos `.env.example`) y `*.pat`.
 - Los scripts de `devops/scripts/` leen el PAT del entorno; no lo reciben como parámetro ni lo escriben en disco.
 - El checklist del PR incluye: "No hay credenciales, tokens ni claves en el código".
-- *Planificado (Fase 2):* secret scanning y push protection de GitHub (disponibles gratis en repos públicos).
+- **Secret scanning** y **push protection** de GitHub activos (Settings → Code security). Un `git push` que contenga un token conocido (de GitHub, Azure, etc.) se rechaza antes de llegar al repo.
+- **Dependabot alerts** y **Dependency graph** activos desde el 2026-10-29 (ver [fallos-pipeline.md](fallos-pipeline.md), F-03).
 
 ## Incidentes de seguridad
 
