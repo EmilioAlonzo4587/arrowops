@@ -82,3 +82,4 @@ A partir del PR #5 se usará **merge commit**: conserva en `main` cada commit in
 | [#19](https://github.com/EmilioAlonzo4587/arrowops/pull/19) | `feature/docker-compose-proyecto` | AB#41 | — |
 | [#20](https://github.com/EmilioAlonzo4587/arrowops/pull/20) | `feature/v2-modelo-operacion` | AB#43 a AB#48 | (v2.0.0) |
 | [#21](https://github.com/EmilioAlonzo4587/arrowops/pull/21) | `feature/v2-bitacora-dashboard` | AB#49 a AB#54 | (v2.0.0) |
+| [#22](https://github.com/EmilioAlonzo4587/arrowops/pull/22) | `feature/release-v2` | AB#55 | **v2.0.0** |
