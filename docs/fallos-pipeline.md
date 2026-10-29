@@ -47,8 +47,55 @@ La ejecución anterior en la misma rama ([#20261029.1](https://dev.azure.com/dev
 
 [#20261029.3](https://dev.azure.com/devopsArrow/ArrowOps/_build/results?buildId=12) (buildId 12), disparada por el PR #6 con los commits `9e9a04e` y `f0774a5`: resultado **succeeded**. Todos los pasos en verde, el audit informativo registra una advertencia (6 vulnerabilidades bajas aceptadas) y se publicó el artefacto `arrowops`.
 
-### Lecciones
+### Lecciones (F-01)
 
 - En YAML, los scripts con `#`, `:` o caracteres especiales van en un bloque literal (`|`).
 - En los agentes Windows, los pasos `script` corren en cmd: usar `call` para los `.cmd` (como npm) y `exit /b` explícito.
 - Cada dependencia nueva, incluso las de desarrollo, se audita antes del PR. El pipeline lo detectó, que es justo su función.
+
+## F-02: fallo controlado, una regresión en la validación del título (PR #7)
+
+Fallo **provocado a propósito** para demostrar que el pipeline detecta regresiones y que la protección de `main` impide integrarlas.
+
+| Campo | Detalle |
+|---|---|
+| Fecha | 2026-10-29 |
+| Rama / PR | `fix/pipeline-fallo-controlado` / [#7](https://github.com/EmilioAlonzo4587/arrowops/pull/7) |
+| Cambio provocado | Commit `7789731`: `TITLE_MAX` baja de 120 a 100 en `backend/src/models/incident.js`, sin actualizar las pruebas ni el `maxlength="120"` del formulario |
+| Ejecución fallida | [#20261029.6](https://dev.azure.com/devopsArrow/ArrowOps/_build/results?buildId=15) (buildId 15) |
+| Paso que falló | *Pruebas con cobertura*: `Tests: 1 failed, 21 passed, 22 total`. *Publicar resultados de pruebas* también se marcó fallido (`failTaskOnFailedTests`) |
+| Pasos omitidos | Revisión de dependencias, empaquetado y publicación del artefacto: **no se generó un artefacto con la regresión** |
+| Bloqueo en GitHub | Check `ArrowOps-CI` en rojo; el estado del PR es `BLOCKED` (*Required statuses must pass before merging*) |
+| Work Item | AB#28 |
+
+### Evidencia (log del paso, buildId 15, log 9)
+
+```
+PASS tests/api/frontend.test.js
+FAIL tests/api/incidents.create.test.js
+   validateIncident › rechaza un titulo demasiado largo
+    expect(received).toEqual(expected) // deep equality
+Tests:       1 failed, 21 passed, 22 total
+```
+
+### Diagnóstico
+
+- La prueba envía un título de 121 caracteres y espera un error que mencione el límite `120`. Recibió `title no puede superar 100 caracteres.`.
+- El límite de 120 es un **contrato** compartido entre el backend y el formulario (`maxlength="120"`). Cambiarlo solo en el backend rompe ese contrato: el formulario permite escribir 101 a 120 caracteres que la API rechaza.
+- **Causa raíz:** se cambió una regla de negocio sin actualizar sus pruebas ni el otro extremo del contrato.
+
+### Corrección
+
+- Se restaura `TITLE_MAX = 120`.
+- Se agrega la prueba del valor límite `acepta un titulo de exactamente 120 caracteres`, que fija el contrato y referencia el `maxlength` del formulario. Faltaba: solo se probaba el caso de 121.
+- Local: `npm test` → 23 pruebas en verde.
+
+### Ejecución exitosa
+
+Ver el check del PR #7 después del commit de corrección. El enlace se registra aquí al confirmarlo.
+
+### Lecciones (F-02)
+
+- El check obligatorio funcionó: la regresión no pudo entrar a `main` y no se generó el artefacto.
+- Los límites que comparten el frontend y el backend necesitan pruebas de los valores límite (N y N+1), no solo del caso inválido.
+- Duplicar las reglas entre el cliente y el servidor (deuda TD-05) hace que este tipo de error sea más probable.

@@ -20,7 +20,8 @@ Configurada en GitHub (Settings → Branches):
 - Se exige Pull Request para todo cambio. No se permite `push` directo.
 - La regla también aplica a administradores (`enforce_admins`).
 - Aprobaciones requeridas: 0. El proyecto es individual y GitHub no permite aprobar un PR propio (ver "Revisión").
-- *Planificado (Fase 2):* exigir que los checks de Azure Pipelines y GitHub Actions estén en verde.
+- **Check obligatorio `ArrowOps-CI`** (Azure Pipelines), con `strict`: la rama debe estar actualizada con `main`. Un PR con el pipeline en rojo queda `BLOCKED` (ver [fallos-pipeline.md](fallos-pipeline.md), F-02).
+- *Planificado:* sumar el workflow de GitHub Actions como segundo check obligatorio.
 
 ## Commits
 
@@ -45,7 +46,7 @@ Tipos: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `ci`.
 1. Se crea la rama desde `main` y se hacen commits con `AB#ID`.
 2. Se abre el PR usando la plantilla [`.github/pull_request_template.md`](../.github/pull_request_template.md): Work Item, descripción, tipo de cambio, evidencia de validación y checklist.
 3. **Revisión:** el proyecto es individual, así que se aplica auto-revisión documentada. Se revisa el diff completo y se dejan comentarios en las líneas con decisiones relevantes. La revisión queda registrada en GitHub con estado *COMMENTED*.
-4. Merge cuando las pruebas pasan. *Planificado (Fase 2):* también con los checks de CI en verde.
+4. Merge solo con el check `ArrowOps-CI` en verde (lo exige GitHub).
 
 ## Estrategia de merge
 
@@ -65,4 +66,5 @@ A partir del PR #5 se usará **merge commit**: conserva en `main` cada commit in
 | [#3](https://github.com/EmilioAlonzo4587/arrowops/pull/3) | `feature/frontend-listado` | AB#11, AB#12, AB#13 | — |
 | [#4](https://github.com/EmilioAlonzo4587/arrowops/pull/4) | `feature/frontend-formulario` | AB#14, AB#15, AB#16 | v0.2.0 |
 | [#5](https://github.com/EmilioAlonzo4587/arrowops/pull/5) | `feature/documentacion` | AB#32 | — |
-| [#6](https://github.com/EmilioAlonzo4587/arrowops/pull/6) | `feature/azure-pipelines` | AB#20, AB#27 | — |
+| [#6](https://github.com/EmilioAlonzo4587/arrowops/pull/6) | `feature/azure-pipelines` | AB#20, AB#27, AB#24, AB#28 | — |
+| [#7](https://github.com/EmilioAlonzo4587/arrowops/pull/7) | `fix/pipeline-fallo-controlado` | AB#28 | — |
