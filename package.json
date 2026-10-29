@@ -4,9 +4,16 @@
   "description": "ArrowOps - gestion de incidentes de TI",
   "private": true,
   "main": "backend/src/server.js",
+  "files": [
+    "backend/src",
+    "frontend",
+    "README.md"
+  ],
   "scripts": {
     "start": "node backend/src/server.js",
-    "test": "jest"
+    "build": "node devops/scripts/build.js",
+    "test": "jest",
+    "test:ci": "jest --ci --coverage --reporters=default --reporters=jest-junit"
   },
   "engines": {
     "node": ">=20"
@@ -15,13 +22,26 @@
     "testEnvironment": "node",
     "roots": [
       "<rootDir>/tests"
+    ],
+    "collectCoverageFrom": [
+      "backend/src/**/*.js",
+      "!backend/src/server.js"
+    ],
+    "coverageReporters": [
+      "text-summary",
+      "cobertura"
     ]
+  },
+  "jest-junit": {
+    "outputDirectory": "reports",
+    "outputName": "junit.xml"
   },
   "dependencies": {
     "express": "4.22.3"
   },
   "devDependencies": {
     "jest": "29.7.0",
+    "jest-junit": "16.0.0",
     "supertest": "7.3.1"
   }
 }
