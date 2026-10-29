@@ -75,4 +75,4 @@ Los errores siempre responden con el formato `{ "errors": ["mensaje", ...] }`.
 | CI | Azure Pipelines: pipeline `ArrowOps-CI` (`azure-pipelines.yml`) en el agente autohospedado `PC-EMILIO` (pool `ArrowOps-SelfHosted`) | Implementado |
 | Checks de PR | GitHub Actions, workflow `PR checks` (`.github/workflows/pr-checks.yml`): build y pruebas en Linux con Node 20 y 22, audit de producción y `dependency-review` | Implementado |
 | Actualización de dependencias | Dependabot (`.github/dependabot.yml`): PR semanales para npm y GitHub Actions | Implementado |
-| Release | Artefacto versionado y ambientes `dev` → `prod` con aprobación | Planificado (Fase 3) |
+| Release | Imagen Docker desde el artefacto; ambientes `arrowops-dev` (:8081) y `arrowops-prod` (:8080) en el agente, con aprobación manual antes de `prod`, health check con verificación de versión y GitHub Release (ver [release.md](release.md)) | Implementado |
