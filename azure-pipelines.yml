@@ -66,9 +66,9 @@ stages:
             displayName: Revision de dependencias de produccion (bloqueante)
 
           # Informativo: reporte completo, incluidas las de desarrollo (ver docs/dependencias.md).
-          - script: npm audit
+          # Registra una advertencia en lugar de marcar el paso como fallido.
+          - script: npm audit || echo ##vso[task.logissue type=warning]npm audit reporta vulnerabilidades en dependencias de desarrollo; ver docs/dependencias.md
             displayName: Reporte completo de dependencias (informativo)
-            continueOnError: true
 
           - script: npm pack --pack-destination "$(Build.ArtifactStagingDirectory)"
             displayName: Empaquetar artefacto (npm pack)
