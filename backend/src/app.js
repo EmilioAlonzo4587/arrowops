@@ -1,7 +1,8 @@
 const path = require('node:path');
 const express = require('express');
 const { createIncidentRepository } = require('./repositories/incidentRepository');
-const { createIncidentsRouter } = require('./routes/incidents');
+const { createIncidentsRouter, createTechniciansRouter } = require('./routes/incidents');
+const { STATUSES, PRIORITIES, CATEGORIES, TRANSITIONS } = require('./models/incident');
 const { version: packageVersion } = require('../../package.json');
 
 function createApp({ repository = createIncidentRepository(), version = packageVersion } = {}) {
@@ -12,6 +13,9 @@ function createApp({ repository = createIncidentRepository(), version = packageV
   // La version permite al pipeline verificar que el ambiente corre la version esperada.
   app.get('/health', (req, res) => res.json({ status: 'ok', version }));
   app.use('/api/incidents', createIncidentsRouter(repository));
+  app.use('/api/technicians', createTechniciansRouter(repository));
+  // Catalogos y flujo de estados: la interfaz los toma de aqui en vez de duplicar las reglas.
+  app.get('/api/meta', (req, res) => res.json({ statuses: STATUSES, priorities: PRIORITIES, categories: CATEGORIES, transitions: TRANSITIONS }));
   app.use(express.static(path.join(__dirname, '..', '..', 'frontend')));
 
   app.use((req, res) => res.status(404).json({ errors: ['Recurso no encontrado.'] }));

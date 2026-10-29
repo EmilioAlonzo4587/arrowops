@@ -5,6 +5,7 @@ const base = {
   title: 'VPN no conecta',
   description: 'Error de autenticacion al conectar desde casa.',
   priority: 'media',
+  category: 'accesos',
 };
 
 describe('PUT /api/incidents/:id', () => {
@@ -16,24 +17,25 @@ describe('PUT /api/incidents/:id', () => {
     created = (await request(app).post('/api/incidents').send(base)).body;
   });
 
-  test('actualiza los campos y conserva id y createdAt', async () => {
+  test('actualiza los datos y conserva id, createdAt y estado', async () => {
     const res = await request(app)
       .put(`/api/incidents/${created.id}`)
-      .send({ ...base, priority: 'alta', status: 'en_progreso' });
+      .send({ ...base, priority: 'alta', category: 'red' });
 
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({
       id: created.id,
       createdAt: created.createdAt,
       priority: 'alta',
-      status: 'en_progreso',
+      category: 'red',
+      status: 'NUEVO',
     });
     expect(res.body.updatedAt >= created.updatedAt).toBe(true);
   });
 
-  test('mantiene el estado si no se envia', async () => {
-    const res = await request(app).put(`/api/incidents/${created.id}`).send(base);
-    expect(res.body.status).toBe('abierto');
+  test('no cambia el estado aunque se envie (usa PATCH /status)', async () => {
+    const res = await request(app).put(`/api/incidents/${created.id}`).send({ ...base, status: 'CERRADO' });
+    expect(res.body.status).toBe('NUEVO');
   });
 
   test('responde 400 si los datos no son validos', async () => {

@@ -27,6 +27,8 @@ function loadConfig(env = process.env) {
     // Desde package.json: funciona igual con npm start que con node dentro del contenedor.
     appVersion: version,
     databaseUrl,
+    // Carga database/seed.sql si la base esta vacia (solo para demo/evaluacion).
+    seedDemoData: env.SEED_DEMO_DATA === 'true',
   };
 }
 

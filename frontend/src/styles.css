@@ -68,10 +68,11 @@ th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; color
 .priority-media { background: #fef9c3; color: #854d0e; }
 .priority-alta { background: #ffedd5; color: #9a3412; }
 .priority-critica { background: #fee2e2; color: #991b1b; }
-.status-abierto { background: #dbeafe; color: #1e40af; }
-.status-en_progreso { background: #ede9fe; color: #5b21b6; }
-.status-resuelto { background: #dcfce7; color: #166534; }
-.status-cerrado { background: #e5e7eb; color: #374151; }
+.status-NUEVO { background: #dbeafe; color: #1e40af; }
+.status-ASIGNADO { background: #fef3c7; color: #92400e; }
+.status-EN_PROCESO { background: #ede9fe; color: #5b21b6; }
+.status-RESUELTO { background: #dcfce7; color: #166534; }
+.status-CERRADO { background: #e5e7eb; color: #374151; }
 
 label { font-size: 0.85rem; color: var(--muted); }
 
@@ -106,3 +107,6 @@ select, input, textarea {
   border-radius: 6px;
   background: #fff;
 }
+.row-actions { margin-top: 4px; flex-wrap: wrap; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+select.assign { font-size: 0.85rem; padding: 3px 6px; }

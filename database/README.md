@@ -4,19 +4,26 @@ ArrowOps usa **PostgreSQL 17** en Docker.
 
 | Archivo | Contenido |
 |---|---|
-| `docker-compose.yml` | Servicio `db` (`postgres:17-alpine`) en el puerto **5433** del host, con un volumen persistente y health check |
-| `schema.sql` | Tabla `incidents` con restricciones e índices; es idempotente |
-| `seed.sql` | Datos de ejemplo para desarrollo |
+| `migrations/001_incidents.sql` | Esquema inicial de v1.0.0: tabla `incidents` |
+| `migrations/002_categoria_tecnicos_estados.sql` | v2.0.0: catálogo `technicians`, columnas `category` y `technician_id`, y conversión de los estados v1 a `NUEVO`, `ASIGNADO`, `EN_PROCESO`, `RESUELTO` y `CERRADO` |
+| `seed.sql` | Datos de ejemplo. La app los carga solo si `SEED_DEMO_DATA=true` y la tabla está vacía |
+| `docker-compose.yml` | PostgreSQL para desarrollo local, en el puerto **5433** del host |
+
+## Migraciones
+
+La app aplica las migraciones pendientes **al arrancar** (`backend/src/db/migrate.js`) y las registra en la tabla `schema_migrations`. No hace falta ejecutar SQL a mano en ningún ambiente.
+
+Para cambiar el esquema, agrega un archivo nuevo con el siguiente número (por ejemplo, `003_...sql`). **Nunca edites una migración ya publicada**: en los ambientes donde ya se aplicó no se volvería a ejecutar.
 
 ## Uso local
 
-1. Crea `.env` en la raíz (está ignorado por git) a partir de `.env.example` y define una contraseña en `POSTGRES_PASSWORD`. Ajusta la misma contraseña en `DATABASE_URL`.
+1. Crea `.env` a partir de `.env.example` y define `POSTGRES_PASSWORD` y `DATABASE_URL`.
 2. Levanta la base de datos:
 
    ```bash
    docker compose --env-file .env -f database/docker-compose.yml up -d --wait
    ```
 
-3. Arranca la app con `DATABASE_URL` definida. Sin esa variable, la app usa el repositorio en memoria.
+3. Arranca la app con `node --env-file=.env backend/src/server.js`. Para cargar los datos de ejemplo, agrega `SEED_DEMO_DATA=true` en `.env`.
 
-`schema.sql` y `seed.sql` solo se ejecutan la primera vez que se crea el volumen. Para empezar de cero: `docker compose ... down -v`.
+Las pruebas de integración (`tests/contract/postgres.test.js`) **borran el esquema completo**. Ejecútalas contra una base desechable, como hace el CI (proyecto `arrowops-ci` en el puerto 5434), nunca contra la base de desarrollo.

@@ -34,15 +34,16 @@
               <option value="critica">Critica</option>
             </select>
           </label>
-          <label>Estado
-            <select id="status">
-              <option value="abierto">Abierto</option>
-              <option value="en_progreso">En progreso</option>
-              <option value="resuelto">Resuelto</option>
-              <option value="cerrado">Cerrado</option>
+          <label>Categoria
+            <select id="category" required>
+              <option value="hardware">Hardware</option>
+              <option value="software">Software</option>
+              <option value="red">Red</option>
+              <option value="accesos">Accesos</option>
+              <option value="otro" selected>Otro</option>
             </select>
           </label>
-          <label class="span-2">Reportado por
+          <label class="span-2">Usuario que reporta
             <input id="reporter" maxlength="80">
           </label>
         </div>
@@ -60,10 +61,11 @@
         <label>Estado
           <select id="status-filter">
             <option value="">Todos</option>
-            <option value="abierto">Abierto</option>
-            <option value="en_progreso">En progreso</option>
-            <option value="resuelto">Resuelto</option>
-            <option value="cerrado">Cerrado</option>
+            <option value="NUEVO">Nuevo</option>
+            <option value="ASIGNADO">Asignado</option>
+            <option value="EN_PROCESO">En proceso</option>
+            <option value="RESUELTO">Resuelto</option>
+            <option value="CERRADO">Cerrado</option>
           </select>
         </label>
       </div>

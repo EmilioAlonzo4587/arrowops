@@ -74,14 +74,18 @@ Sin `DATABASE_URL`, la app usa un repositorio en memoria. Ver [database/README.m
 
 | Método | Ruta | Descripción |
 |---|---|---|
-| `GET` | `/health` | Estado del servicio |
-| `GET` | `/api/incidents?status=&priority=` | Lista de incidentes, con filtros opcionales |
+| `GET` | `/health` | Estado y versión del servicio |
+| `GET` | `/api/incidents?status=&priority=&category=&technicianId=` | Lista de incidentes, con filtros opcionales |
 | `GET` | `/api/incidents/:id` | Detalle de un incidente |
-| `POST` | `/api/incidents` | Crea un incidente |
-| `PUT` | `/api/incidents/:id` | Actualiza un incidente |
+| `POST` | `/api/incidents` | Crea un incidente (estado `NUEVO`) |
+| `PUT` | `/api/incidents/:id` | Edita los datos de un incidente |
+| `PATCH` | `/api/incidents/:id/assign` | Asigna un técnico (`NUEVO` pasa a `ASIGNADO`) |
+| `PATCH` | `/api/incidents/:id/status` | Cambia el estado según el flujo |
 | `DELETE` | `/api/incidents/:id` | Elimina un incidente |
+| `GET` | `/api/technicians` | Catálogo de técnicos |
+| `GET` | `/api/meta` | Estados, prioridades, categorías y transiciones |
 
-Campos: `title` y `description` (obligatorios), `priority` (`baja`, `media`, `alta`, `critica`), `status` (`abierto`, `en_progreso`, `resuelto`, `cerrado`) y `reporter` (opcional).
+Campos: `title`, `description`, `category` (`hardware`, `software`, `red`, `accesos`, `otro`) y `priority` (`baja`, `media`, `alta`, `critica`) son obligatorios; `reporter` es opcional. Flujo de estados: `NUEVO` → `ASIGNADO` → `EN_PROCESO` → `RESUELTO` → `CERRADO` (ver [docs/arquitectura.md](docs/arquitectura.md)).
 
 ## Flujo de trabajo
 

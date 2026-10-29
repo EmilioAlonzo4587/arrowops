@@ -24,7 +24,7 @@ services:
     # Sin puertos publicados: la base de datos solo es accesible desde la app (red interna).
     volumes:
       - data:/var/lib/postgresql/data
-      - ../../database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      # Sin scripts de inicio: la app aplica las migraciones versionadas al arrancar.
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U arrowops -d arrowops"]
       interval: 3s

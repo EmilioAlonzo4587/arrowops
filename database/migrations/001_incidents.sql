@@ -1,6 +1,5 @@
--- Esquema de ArrowOps. Idempotente: se puede ejecutar varias veces.
--- Las reglas reflejan backend/src/models/incident.js; la API valida antes de llegar aqui
--- y la base de datos es la ultima linea de defensa.
+-- 001: esquema inicial de ArrowOps (v1.0.0). Idempotente: las bases creadas con el antiguo
+-- database/schema.sql ya tienen esta tabla, y aqui solo queda registrada como aplicada.
 
 CREATE TABLE IF NOT EXISTS incidents (
     id          UUID          PRIMARY KEY DEFAULT gen_random_uuid(),

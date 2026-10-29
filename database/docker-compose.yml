@@ -19,9 +19,8 @@ services:
       - "${ARROWOPS_DB_PORT:-5433}:5432"
     volumes:
       - arrowops-data:/var/lib/postgresql/data
-      # Se ejecutan solo al crear el volumen por primera vez, en orden alfabetico.
-      - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
-      - ./seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+      # Sin scripts de inicio: la app aplica database/migrations al arrancar
+      # y carga seed.sql si SEED_DEMO_DATA=true y la base esta vacia.
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U arrowops -d arrowops"]
       interval: 3s

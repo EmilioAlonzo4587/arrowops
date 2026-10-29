@@ -3,12 +3,19 @@ const messageEl = document.getElementById('message');
 const statusFilterEl = document.getElementById('status-filter');
 
 const STATUS_LABELS = {
-  abierto: 'Abierto',
-  en_progreso: 'En progreso',
-  resuelto: 'Resuelto',
-  cerrado: 'Cerrado',
+  NUEVO: 'Nuevo',
+  ASIGNADO: 'Asignado',
+  EN_PROCESO: 'En proceso',
+  RESUELTO: 'Resuelto',
+  CERRADO: 'Cerrado',
 };
 const PRIORITY_LABELS = { baja: 'Baja', media: 'Media', alta: 'Alta', critica: 'Critica' };
+const CATEGORY_LABELS = { hardware: 'Hardware', software: 'Software', red: 'Red', accesos: 'Accesos', otro: 'Otro' };
+// Estados en los que el servidor permite asignar o reasignar tecnico.
+const ASSIGNABLE = ['NUEVO', 'ASIGNADO', 'EN_PROCESO'];
+
+// Catalogos que vienen del servidor (GET /api/meta y /api/technicians).
+const state = { transitions: {}, technicians: [] };
 
 function showMessage(text) {
   messageEl.textContent = text;
@@ -28,6 +35,28 @@ function formatDate(iso) {
   return new Date(iso).toLocaleString('es-GT', { dateStyle: 'short', timeStyle: 'short' });
 }
 
+function technicianCell(incident) {
+  if (!ASSIGNABLE.includes(incident.status)) {
+    return escapeHtml(incident.technician ? incident.technician.name : '-');
+  }
+  const current = incident.technician ? incident.technician.id : '';
+  const options = state.technicians.map((t) =>
+    `<option value="${t.id}" ${t.id === current ? 'selected' : ''}>${escapeHtml(t.name)}</option>`).join('');
+  return `<select class="assign" data-id="${incident.id}" aria-label="Asignar tecnico">
+      <option value="" ${current ? '' : 'selected'} disabled>Asignar...</option>${options}
+    </select>`;
+}
+
+// Botones para los siguientes estados validos (ASIGNADO se alcanza asignando un tecnico).
+function statusCell(incident) {
+  const next = (state.transitions[incident.status] || []).filter((s) => s !== 'ASIGNADO');
+  const buttons = next.map((s) =>
+    `<button class="btn btn-sm" data-action="status" data-status="${s}" data-id="${incident.id}"
+       ${incident.technician ? '' : 'disabled title="Asigna un tecnico primero"'}>&rarr; ${STATUS_LABELS[s]}</button>`).join('');
+  return `<span class="badge status-${incident.status}">${STATUS_LABELS[incident.status]}</span>
+    <div class="row-actions">${buttons}</div>`;
+}
+
 function renderIncidents(incidents) {
   if (incidents.length === 0) {
     listEl.innerHTML = '<p class="empty">No hay incidentes para mostrar.</p>';
@@ -40,8 +69,10 @@ function renderIncidents(incidents) {
         <strong>${escapeHtml(i.title)}</strong>
         <div class="muted">${escapeHtml(i.description)}</div>
       </td>
+      <td>${CATEGORY_LABELS[i.category] || escapeHtml(i.category)}</td>
       <td><span class="badge priority-${i.priority}">${PRIORITY_LABELS[i.priority]}</span></td>
-      <td><span class="badge status-${i.status}">${STATUS_LABELS[i.status]}</span></td>
+      <td>${statusCell(i)}</td>
+      <td>${technicianCell(i)}</td>
       <td>${escapeHtml(i.reporter || '-')}</td>
       <td class="nowrap">${formatDate(i.createdAt)}</td>
       <td>
@@ -56,7 +87,8 @@ function renderIncidents(incidents) {
     <div class="table-wrap">
       <table>
         <thead>
-          <tr><th>Incidente</th><th>Prioridad</th><th>Estado</th><th>Reportado por</th><th>Creado</th><th></th></tr>
+          <tr><th>Incidente</th><th>Categoria</th><th>Prioridad</th><th>Estado</th><th>Tecnico</th>
+              <th>Usuario</th><th>Fecha</th><th></th></tr>
         </thead>
         <tbody>${rows}</tbody>
       </table>
@@ -99,11 +131,14 @@ async function saveIncident(event) {
 async function handleRowAction(event) {
   const button = event.target.closest('button[data-action]');
   if (!button) return;
-  const { action, id } = button.dataset;
+  const { action, id, status } = button.dataset;
 
   try {
     if (action === 'edit') {
       incidentForm.fill(await api.getIncident(id));
+    } else if (action === 'status') {
+      await api.changeStatus(id, status);
+      await loadIncidents();
     } else if (action === 'delete' && window.confirm('Eliminar este incidente?')) {
       await api.deleteIncident(id);
       if (incidentForm.editingId() === id) incidentForm.reset();
@@ -114,8 +149,31 @@ async function handleRowAction(event) {
   }
 }
 
+async function handleAssign(event) {
+  const select = event.target.closest('select.assign');
+  if (!select || !select.value) return;
+  try {
+    await api.assignIncident(select.dataset.id, Number(select.value));
+    await loadIncidents();
+  } catch (err) {
+    showMessage(err.message);
+  }
+}
+
+async function init() {
+  try {
+    const [meta, technicians] = await Promise.all([api.getMeta(), api.listTechnicians()]);
+    state.transitions = meta.transitions;
+    state.technicians = technicians;
+  } catch (err) {
+    showMessage(`No se pudieron cargar los catalogos: ${err.message}`);
+  }
+  await loadIncidents();
+}
+
 statusFilterEl.addEventListener('change', loadIncidents);
 incidentForm.el.addEventListener('submit', saveIncident);
 listEl.addEventListener('click', handleRowAction);
+listEl.addEventListener('change', handleAssign);
 
-loadIncidents();
+init();

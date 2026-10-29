@@ -24,6 +24,28 @@ const api = {
   deleteIncident(id) {
     return request(`/api/incidents/${encodeURIComponent(id)}`, { method: 'DELETE' });
   },
+
+  assignIncident(id, technicianId) {
+    return request(`/api/incidents/${encodeURIComponent(id)}/assign`, {
+      method: 'PATCH',
+      body: JSON.stringify({ technicianId }),
+    });
+  },
+
+  changeStatus(id, status) {
+    return request(`/api/incidents/${encodeURIComponent(id)}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    });
+  },
+
+  listTechnicians() {
+    return request('/api/technicians');
+  },
+
+  getMeta() {
+    return request('/api/meta');
+  },
 };
 
 async function request(url, options = {}) {
