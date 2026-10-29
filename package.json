@@ -30,7 +30,15 @@
     "coverageReporters": [
       "text-summary",
       "cobertura"
-    ]
+    ],
+    "coverageThreshold": {
+      "global": {
+        "lines": 95,
+        "statements": 95,
+        "functions": 95,
+        "branches": 90
+      }
+    }
   },
   "jest-junit": {
     "outputDirectory": "reports",
