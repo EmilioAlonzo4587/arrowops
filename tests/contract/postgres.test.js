@@ -29,7 +29,8 @@ describeIfDb('PostgreSQL', () => {
   });
 
   beforeEach(async () => {
-    await pool.query('TRUNCATE incidents');
+    // CASCADE: tambien vacia incident_events, que referencia a incidents.
+    await pool.query('TRUNCATE incidents CASCADE');
   });
 
   afterAll(async () => {
@@ -71,10 +72,12 @@ describeIfDb('PostgreSQL', () => {
     expect(await runMigrations(pool)).toEqual([]);
   });
 
-  test('los datos de ejemplo se cargan solo con la base vacia', async () => {
+  test('los datos de ejemplo se cargan solo con la base vacia, con su historial', async () => {
     expect(await seedDemoData(pool)).toBe(true);
     const { rows } = await pool.query('SELECT count(*)::int AS total FROM incidents');
     expect(rows[0].total).toBeGreaterThan(0);
+    const events = await pool.query('SELECT count(DISTINCT incident_id)::int AS total FROM incident_events');
+    expect(events.rows[0].total).toBe(rows[0].total);
     expect(await seedDemoData(pool)).toBe(false);
   });
 
@@ -90,7 +93,7 @@ describeIfDb('PostgreSQL', () => {
         ('a', 'd', 'baja', 'abierto'), ('b', 'd', 'alta', 'en_progreso'),
         ('c', 'd', 'media', 'resuelto'), ('d', 'd', 'critica', 'cerrado')`);
 
-      expect(await runMigrations(pool)).toEqual(['002_categoria_tecnicos_estados']);
+      expect(await runMigrations(pool)).toEqual(['002_categoria_tecnicos_estados', '003_bitacora']);
 
       const { rows } = await pool.query('SELECT title, status, category, technician_id FROM incidents ORDER BY title');
       expect(rows).toEqual([
@@ -99,6 +102,9 @@ describeIfDb('PostgreSQL', () => {
         { title: 'c', status: 'RESUELTO', category: 'otro', technician_id: null },
         { title: 'd', status: 'CERRADO', category: 'otro', technician_id: null },
       ]);
+      // Cada incidente heredado empieza su historial con el evento de creacion.
+      const events = await pool.query("SELECT count(*)::int AS total FROM incident_events WHERE type = 'creado'");
+      expect(events.rows[0].total).toBe(4);
     } finally {
       fs.rmSync(v1Dir, { recursive: true, force: true });
       await resetDatabase(pool);
