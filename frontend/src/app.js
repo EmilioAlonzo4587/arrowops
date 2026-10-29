@@ -1,6 +1,10 @@
 const listEl = document.getElementById('list');
 const messageEl = document.getElementById('message');
-const statusFilterEl = document.getElementById('status-filter');
+const filterEls = [...document.querySelectorAll('[data-filter]')];
+const technicianFilterEl = document.getElementById('technician-filter');
+const detailPanelEl = document.getElementById('detail-panel');
+const timelineEl = document.getElementById('timeline');
+const commentFormEl = document.getElementById('comment-form');
 
 const STATUS_LABELS = {
   NUEVO: 'Nuevo',
@@ -14,8 +18,8 @@ const CATEGORY_LABELS = { hardware: 'Hardware', software: 'Software', red: 'Red'
 // Estados en los que el servidor permite asignar o reasignar tecnico.
 const ASSIGNABLE = ['NUEVO', 'ASIGNADO', 'EN_PROCESO'];
 
-// Catalogos que vienen del servidor (GET /api/meta y /api/technicians).
-const state = { transitions: {}, technicians: [] };
+// Catalogos que vienen del servidor (GET /api/meta y /api/technicians) e incidente abierto en el detalle.
+const state = { transitions: {}, technicians: [], detailId: null };
 
 function showMessage(text) {
   messageEl.textContent = text;
@@ -77,6 +81,7 @@ function renderIncidents(incidents) {
       <td class="nowrap">${formatDate(i.createdAt)}</td>
       <td>
         <div class="row-actions">
+          <button class="btn btn-sm" data-action="history" data-id="${i.id}">Historial</button>
           <button class="btn btn-sm" data-action="edit" data-id="${i.id}">Editar</button>
           <button class="btn btn-sm btn-danger" data-action="delete" data-id="${i.id}">Eliminar</button>
         </div>
@@ -95,13 +100,89 @@ function renderIncidents(incidents) {
     </div>`;
 }
 
+function currentFilters() {
+  return Object.fromEntries(filterEls.map((el) => [el.dataset.filter, el.value]));
+}
+
 async function loadIncidents() {
   try {
-    const incidents = await api.listIncidents({ status: statusFilterEl.value });
+    const incidents = await api.listIncidents(currentFilters());
     showMessage('');
     renderIncidents(incidents);
   } catch (err) {
     showMessage(`No se pudieron cargar los incidentes: ${err.message}`);
+  }
+}
+
+async function loadStats() {
+  try {
+    dashboard.render(await api.getStats());
+  } catch (err) {
+    showMessage(`No se pudieron cargar los indicadores: ${err.message}`);
+  }
+}
+
+// Recarga tabla, indicadores y, si esta abierto, el historial.
+async function refresh() {
+  await Promise.all([loadIncidents(), loadStats(), state.detailId ? loadHistory() : null]);
+}
+
+const EVENT_TEXT = {
+  creado: (e) => `Incidente creado (${STATUS_LABELS[e.toStatus] || e.toStatus})`,
+  editado: () => 'Datos del incidente editados',
+  asignado: (e) => e.message,
+  estado: (e) => `Estado: ${STATUS_LABELS[e.fromStatus] || e.fromStatus} &rarr; ${STATUS_LABELS[e.toStatus] || e.toStatus}`,
+  comentario: (e) => e.message,
+};
+
+function renderHistory(events) {
+  timelineEl.innerHTML = events.map((e) => `
+    <li class="event event-${e.type}">
+      <div class="event-meta">${formatDate(e.createdAt)} &middot; ${escapeHtml(e.author || 'Sistema')}</div>
+      <div>${e.type === 'estado' ? EVENT_TEXT.estado(e) : escapeHtml(EVENT_TEXT[e.type](e))}</div>
+    </li>`).join('') || '<li class="empty">Sin eventos.</li>';
+}
+
+async function loadHistory() {
+  try {
+    renderHistory(await api.getHistory(state.detailId));
+  } catch (err) {
+    showMessage(err.message);
+  }
+}
+
+async function openDetail(id) {
+  const incident = await api.getIncident(id);
+  state.detailId = id;
+  document.getElementById('detail-title').textContent = `Historial: ${incident.title}`;
+  detailPanelEl.hidden = false;
+  await loadHistory();
+  detailPanelEl.scrollIntoView({ behavior: 'smooth' });
+}
+
+function closeDetail() {
+  state.detailId = null;
+  detailPanelEl.hidden = true;
+}
+
+async function saveComment(event) {
+  event.preventDefault();
+  const errorsEl = document.getElementById('comment-errors');
+  const message = document.getElementById('comment-message').value.trim();
+  const author = document.getElementById('comment-author').value.trim();
+  if (!message) {
+    errorsEl.textContent = 'El comentario es obligatorio.';
+    errorsEl.hidden = false;
+    return;
+  }
+  try {
+    await api.addComment(state.detailId, author ? { author, message } : { message });
+    document.getElementById('comment-message').value = '';
+    errorsEl.hidden = true;
+    await loadHistory();
+  } catch (err) {
+    errorsEl.textContent = err.message;
+    errorsEl.hidden = false;
   }
 }
 
@@ -122,7 +203,7 @@ async function saveIncident(event) {
       await api.createIncident(data);
     }
     incidentForm.reset();
-    await loadIncidents();
+    await refresh();
   } catch (err) {
     incidentForm.showErrors([err.message]);
   }
@@ -134,15 +215,18 @@ async function handleRowAction(event) {
   const { action, id, status } = button.dataset;
 
   try {
-    if (action === 'edit') {
+    if (action === 'history') {
+      await openDetail(id);
+    } else if (action === 'edit') {
       incidentForm.fill(await api.getIncident(id));
     } else if (action === 'status') {
       await api.changeStatus(id, status);
-      await loadIncidents();
+      await refresh();
     } else if (action === 'delete' && window.confirm('Eliminar este incidente?')) {
       await api.deleteIncident(id);
       if (incidentForm.editingId() === id) incidentForm.reset();
-      await loadIncidents();
+      if (state.detailId === id) closeDetail();
+      await refresh();
     }
   } catch (err) {
     showMessage(err.message);
@@ -154,7 +238,7 @@ async function handleAssign(event) {
   if (!select || !select.value) return;
   try {
     await api.assignIncident(select.dataset.id, Number(select.value));
-    await loadIncidents();
+    await refresh();
   } catch (err) {
     showMessage(err.message);
   }
@@ -165,13 +249,20 @@ async function init() {
     const [meta, technicians] = await Promise.all([api.getMeta(), api.listTechnicians()]);
     state.transitions = meta.transitions;
     state.technicians = technicians;
+    technicianFilterEl.append(...technicians.map((t) => new Option(t.name, t.id)));
   } catch (err) {
     showMessage(`No se pudieron cargar los catalogos: ${err.message}`);
   }
-  await loadIncidents();
+  await refresh();
 }
 
-statusFilterEl.addEventListener('change', loadIncidents);
+filterEls.forEach((el) => el.addEventListener('change', loadIncidents));
+document.getElementById('clear-filters').addEventListener('click', () => {
+  filterEls.forEach((el) => { el.value = ''; });
+  loadIncidents();
+});
+document.getElementById('detail-close').addEventListener('click', closeDetail);
+commentFormEl.addEventListener('submit', saveComment);
 incidentForm.el.addEventListener('submit', saveIncident);
 listEl.addEventListener('click', handleRowAction);
 listEl.addEventListener('change', handleAssign);

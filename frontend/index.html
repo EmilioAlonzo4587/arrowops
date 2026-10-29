@@ -13,6 +13,22 @@
   </header>
 
   <main class="container">
+    <section class="panel" id="dashboard-panel">
+      <div class="panel-header">
+        <h2>Indicadores</h2>
+      </div>
+      <div class="cards">
+        <div class="card"><span class="card-value" id="kpi-abiertos">-</span><span class="card-label">Abiertos</span></div>
+        <div class="card card-danger"><span class="card-value" id="kpi-criticos">-</span><span class="card-label">Criticos abiertos</span></div>
+        <div class="card card-ok"><span class="card-value" id="kpi-cerrados">-</span><span class="card-label">Cerrados</span></div>
+        <div class="card"><span class="card-value" id="kpi-total">-</span><span class="card-label">Total</span></div>
+      </div>
+      <div class="charts">
+        <div><h3>Por categoria</h3><div id="chart-categoria" class="bars"></div></div>
+        <div><h3>Abiertos por tecnico</h3><div id="chart-tecnico" class="bars"></div></div>
+      </div>
+    </section>
+
     <section class="panel">
       <div class="panel-header">
         <h2 id="form-title">Nuevo incidente</h2>
@@ -58,8 +74,10 @@
     <section class="panel">
       <div class="panel-header">
         <h2>Incidentes</h2>
+      </div>
+      <div class="filters">
         <label>Estado
-          <select id="status-filter">
+          <select id="status-filter" data-filter="status">
             <option value="">Todos</option>
             <option value="NUEVO">Nuevo</option>
             <option value="ASIGNADO">Asignado</option>
@@ -68,14 +86,62 @@
             <option value="CERRADO">Cerrado</option>
           </select>
         </label>
+        <label>Prioridad
+          <select id="priority-filter" data-filter="priority">
+            <option value="">Todas</option>
+            <option value="critica">Critica</option>
+            <option value="alta">Alta</option>
+            <option value="media">Media</option>
+            <option value="baja">Baja</option>
+          </select>
+        </label>
+        <label>Categoria
+          <select id="category-filter" data-filter="category">
+            <option value="">Todas</option>
+            <option value="hardware">Hardware</option>
+            <option value="software">Software</option>
+            <option value="red">Red</option>
+            <option value="accesos">Accesos</option>
+            <option value="otro">Otro</option>
+          </select>
+        </label>
+        <label>Tecnico
+          <select id="technician-filter" data-filter="technicianId">
+            <option value="">Todos</option>
+          </select>
+        </label>
+        <button type="button" id="clear-filters" class="btn btn-sm">Limpiar filtros</button>
       </div>
       <p id="message" class="message" hidden></p>
       <div id="list"></div>
+    </section>
+
+    <section class="panel" id="detail-panel" hidden>
+      <div class="panel-header">
+        <h2 id="detail-title">Historial</h2>
+        <button type="button" id="detail-close" class="btn btn-sm">Cerrar</button>
+      </div>
+      <ol id="timeline" class="timeline"></ol>
+      <form id="comment-form" novalidate>
+        <div class="grid">
+          <label>Autor
+            <input id="comment-author" maxlength="80">
+          </label>
+          <label class="span-2">Comentario
+            <textarea id="comment-message" rows="2" maxlength="1000" required></textarea>
+          </label>
+        </div>
+        <p id="comment-errors" class="message" hidden></p>
+        <div class="actions">
+          <button type="submit" class="btn btn-primary">Agregar comentario</button>
+        </div>
+      </form>
     </section>
   </main>
 
   <script src="src/api.js"></script>
   <script src="src/form.js"></script>
+  <script src="src/dashboard.js"></script>
   <script src="src/app.js"></script>
 </body>
 </html>

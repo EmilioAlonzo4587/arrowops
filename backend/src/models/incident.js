@@ -54,6 +54,32 @@ function validateIncident(data) {
   return errors;
 }
 
+const COMMENT_MAX = 1000;
+const AUTHOR_MAX = 80;
+
+// Comentario de la bitacora: mensaje obligatorio, autor opcional.
+function validateComment(data) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    return ['El cuerpo de la peticion debe ser un objeto JSON.'];
+  }
+  const errors = [];
+  if (typeof data.message !== 'string' || data.message.trim() === '') {
+    errors.push('message es obligatorio.');
+  } else if (data.message.trim().length > COMMENT_MAX) {
+    errors.push(`message no puede superar ${COMMENT_MAX} caracteres.`);
+  }
+  if (data.author !== undefined && (typeof data.author !== 'string' || data.author.length > AUTHOR_MAX)) {
+    errors.push(`author debe ser texto de hasta ${AUTHOR_MAX} caracteres.`);
+  }
+  return errors;
+}
+
+// Autor opcional de una operacion (asignar, cambiar estado): texto recortado o null.
+function authorOf(body) {
+  const author = body && typeof body.author === 'string' ? body.author.trim().slice(0, AUTHOR_MAX) : '';
+  return author || null;
+}
+
 // Valida un cambio de estado. Devuelve el mensaje de error o null si es valido.
 function checkStatusChange(incident, nextStatus) {
   if (!STATUSES.includes(nextStatus)) {
@@ -92,6 +118,8 @@ module.exports = {
   CATEGORIES,
   TRANSITIONS,
   validateIncident,
+  validateComment,
+  authorOf,
   checkStatusChange,
   checkAssignment,
   statusAfterAssignment,

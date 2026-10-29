@@ -90,6 +90,23 @@ function describeIncidentRepositoryContract(name, getRepository) {
       expect(await repo.remove('no-es-un-uuid')).toBe(false);
     });
 
+    test('bitacora: addEvent y listEvents en orden cronologico; remove borra el historial', async () => {
+      const created = await repo.create(base);
+      const first = await repo.addEvent(created.id, { type: 'creado', author: 'noc', toStatus: 'NUEVO' });
+      await repo.addEvent(created.id, { type: 'asignado', technicianId: techA.id, fromStatus: 'NUEVO', toStatus: 'ASIGNADO' });
+      await repo.addEvent(created.id, { type: 'comentario', message: 'Revisando' });
+
+      expect(first).toMatchObject({ type: 'creado', author: 'noc', message: null, toStatus: 'NUEVO', technician: null });
+      expect(first.id).toEqual(expect.any(Number));
+      const events = await repo.listEvents(created.id);
+      expect(events.map((e) => e.type)).toEqual(['creado', 'asignado', 'comentario']);
+      expect(events[1].technician).toEqual({ id: techA.id, name: techA.name });
+      expect(await repo.listEvents('no-es-un-uuid')).toEqual([]);
+
+      await repo.remove(created.id);
+      expect(await repo.listEvents(created.id)).toEqual([]);
+    });
+
     test('catalogo de tecnicos ordenado por nombre', async () => {
       const technicians = await repo.listTechnicians();
       expect(technicians.map((t) => t.name)).toEqual(['Ana Lopez', 'Carlos Perez', 'Jorge Ramirez', 'Maria Garcia']);

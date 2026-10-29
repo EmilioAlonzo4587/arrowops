@@ -11,3 +11,8 @@ INSERT INTO incidents (title, description, priority, category, status, technicia
     ('Wifi intermitente en sala de juntas', 'Se desconecta cada 10 minutos.', 'media', 'red', 'CERRADO',
         (SELECT id FROM technicians WHERE name = 'Jorge Ramirez'), 'recepcion'),
     ('Servidor de archivos sin espacio', 'Unidad compartida al 99%.', 'critica', 'hardware', 'NUEVO', NULL, 'contabilidad');
+
+-- Historial inicial de los datos de ejemplo.
+INSERT INTO incident_events (incident_id, type, author, to_status, created_at)
+SELECT id, 'creado', reporter, status, created_at FROM incidents
+WHERE NOT EXISTS (SELECT 1 FROM incident_events e WHERE e.incident_id = incidents.id);

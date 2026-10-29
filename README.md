@@ -1,6 +1,8 @@
 # ArrowOps
 
-ArrowOps es una solución web para registrar, dar seguimiento y cerrar incidentes de TI. El proyecto demuestra un proceso DevOps verificable, desde la necesidad del negocio hasta la versión `v1.0.0`.
+ArrowOps es una solución web para registrar, dar seguimiento y cerrar incidentes de TI. El proyecto demuestra un proceso DevOps verificable, desde la necesidad del negocio hasta una versión estable con release controlado.
+
+**Funcionalidad:** alta y consulta de incidentes con título, descripción, categoría, prioridad, usuario, fecha y estado; asignación de técnico y flujo de estados `NUEVO` → `ASIGNADO` → `EN_PROCESO` → `RESUELTO` → `CERRADO`; bitácora con comentarios e historial por incidente; filtros por estado, prioridad, categoría y técnico; y dashboard con abiertos, cerrados, críticos y distribución por categoría y técnico.
 
 ## Estructura
 
@@ -82,6 +84,9 @@ Sin `DATABASE_URL`, la app usa un repositorio en memoria. Ver [database/README.m
 | `PATCH` | `/api/incidents/:id/assign` | Asigna un técnico (`NUEVO` pasa a `ASIGNADO`) |
 | `PATCH` | `/api/incidents/:id/status` | Cambia el estado según el flujo |
 | `DELETE` | `/api/incidents/:id` | Elimina un incidente |
+| `GET` | `/api/incidents/:id/history` | Bitácora del incidente |
+| `POST` | `/api/incidents/:id/comments` | Agrega un comentario |
+| `GET` | `/api/stats` | Indicadores del dashboard |
 | `GET` | `/api/technicians` | Catálogo de técnicos |
 | `GET` | `/api/meta` | Estados, prioridades, categorías y transiciones |
 

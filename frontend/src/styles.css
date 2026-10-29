@@ -110,3 +110,35 @@ select, input, textarea {
 .row-actions { margin-top: 4px; flex-wrap: wrap; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 select.assign { font-size: 0.85rem; padding: 3px 6px; }
+
+/* Dashboard */
+.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.card { border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 4px; border-left: 4px solid var(--accent); }
+.card-danger { border-left-color: var(--danger); }
+.card-ok { border-left-color: #16a34a; }
+.card-value { font-size: 1.8rem; font-weight: 700; line-height: 1; }
+.card-label { color: var(--muted); font-size: 0.85rem; }
+.charts { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.charts h3 { margin: 0 0 10px; font-size: 0.95rem; }
+.bars { display: flex; flex-direction: column; gap: 6px; }
+.bar-row { display: grid; grid-template-columns: 110px 1fr 32px; align-items: center; gap: 8px; font-size: 0.85rem; }
+.bar-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-track { background: #eef2f7; border-radius: 999px; height: 10px; overflow: hidden; }
+.bar-fill { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.bar-value { text-align: right; font-weight: 600; }
+@media (max-width: 700px) {
+  .cards { grid-template-columns: repeat(2, 1fr); }
+  .charts { grid-template-columns: 1fr; }
+}
+
+/* Filtros */
+.filters { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 14px; }
+.filters label { display: flex; flex-direction: column; gap: 4px; }
+
+/* Historial */
+.timeline { list-style: none; margin: 0 0 16px; padding: 0 0 0 16px; border-left: 2px solid var(--border); }
+.event { position: relative; padding: 0 0 12px 12px; }
+.event::before { content: ''; position: absolute; left: -23px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+.event-comentario::before { background: #16a34a; }
+.event-estado::before { background: #7c3aed; }
+.event-meta { color: var(--muted); font-size: 0.8rem; }

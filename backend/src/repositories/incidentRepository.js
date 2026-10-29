@@ -7,6 +7,8 @@ const DEFAULT_TECHNICIANS = ['Ana Lopez', 'Carlos Perez', 'Maria Garcia', 'Jorge
 // se usa sin DATABASE_URL (desarrollo rapido y pruebas unitarias).
 function createIncidentRepository() {
   const incidents = new Map();
+  const events = new Map(); // incidentId -> eventos en orden cronologico
+  let nextEventId = 1;
   const technicians = DEFAULT_TECHNICIANS.map((name, i) => ({ id: i + 1, name, active: true }));
 
   function technicianRef(id) {
@@ -88,7 +90,27 @@ function createIncidentRepository() {
     },
 
     remove(id) {
+      events.delete(id);
       return incidents.delete(id);
+    },
+
+    addEvent(incidentId, { type, author = null, message = null, fromStatus = null, toStatus = null, technicianId = null }) {
+      const event = {
+        id: nextEventId++,
+        type,
+        author,
+        message,
+        fromStatus,
+        toStatus,
+        technician: technicianRef(technicianId),
+        createdAt: new Date().toISOString(),
+      };
+      events.set(incidentId, [...(events.get(incidentId) || []), event]);
+      return event;
+    },
+
+    listEvents(incidentId) {
+      return events.get(incidentId) || [];
     },
 
     listTechnicians() {
