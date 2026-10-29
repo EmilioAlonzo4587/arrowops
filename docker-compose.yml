@@ -1,0 +1,43 @@
+# ArrowOps completo con un solo comando: app + PostgreSQL con esquema y datos de ejemplo.
+#
+#   1. cp .env.example .env        (y definir POSTGRES_PASSWORD con cualquier valor)
+#   2. docker compose up -d --build
+#   3. abrir http://localhost:3000
+#
+# Para detener: docker compose down   |   Borrar tambien los datos: docker compose down -v
+# La contrasena NO esta en el repositorio: se lee de .env (ignorado por git).
+
+name: arrowops-app
+
+services:
+  app:
+    build: .
+    image: arrowops:local
+    environment:
+      DATABASE_URL: postgres://arrowops:${POSTGRES_PASSWORD:?Copia .env.example a .env y define POSTGRES_PASSWORD}@db:5432/arrowops
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: arrowops
+      POSTGRES_USER: arrowops
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U arrowops -d arrowops"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  data:
