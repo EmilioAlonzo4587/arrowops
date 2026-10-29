@@ -39,6 +39,21 @@ const api = {
     });
   },
 
+  getHistory(id) {
+    return request(`/api/incidents/${encodeURIComponent(id)}/history`);
+  },
+
+  addComment(id, data) {
+    return request(`/api/incidents/${encodeURIComponent(id)}/comments`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  getStats() {
+    return request('/api/stats');
+  },
+
   listTechnicians() {
     return request('/api/technicians');
   },
