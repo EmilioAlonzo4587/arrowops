@@ -18,6 +18,7 @@ Las ramas salen de `main` actualizada. GitHub **borra automáticamente** la rama
 Configurada en GitHub (Settings → Branches):
 
 - Se exige Pull Request para todo cambio. No se permite `push` directo.
+  - **Excepción:** los dos primeros commits ([`aaa5466`](https://github.com/EmilioAlonzo4587/arrowops/commit/aaa54666dc61812faed87f39c103d1a6f8bb9fec), estructura inicial, y [`0d2ce8e`](https://github.com/EmilioAlonzo4587/arrowops/commit/0d2ce8e77aa307ca7eb0ccc4723e116c755f8b04), script de sprints, ambos con AB#17) se subieron directamente a `main`, antes de activar la protección. Desde el PR #1, todo cambio entra por Pull Request.
 - La regla también aplica a administradores (`enforce_admins`).
 - Aprobaciones requeridas: 0. El proyecto es individual y GitHub no permite aprobar un PR propio (ver "Revisión").
 - **Check obligatorio `ArrowOps-CI`** (Azure Pipelines), con `strict`: la rama debe estar actualizada con `main`. Un PR con el pipeline en rojo queda `BLOCKED` (ver [fallos-pipeline.md](fallos-pipeline.md), F-02).
@@ -26,6 +27,26 @@ Configurada en GitHub (Settings → Branches):
 ## PR de Dependabot
 
 Dependabot abre PR semanales con la etiqueta `dependencias`. Como los genera un bot, sus commits no llevan `AB#`. Para mantener la trazabilidad, al revisarlos se agrega `AB#24` (análisis de dependencias) en la descripción del PR antes del merge. Deben pasar los mismos checks obligatorios que cualquier PR.
+
+En la revisión final de la entrega se detectó que los PR #10, #11 y #12 no tenían `AB#24` y que el #12 no tenía revisión. Se corrigieron **después del merge**: se agregó `AB#24` a las tres descripciones y se publicó la revisión del #12. Las fechas de esas ediciones quedan visibles en GitHub.
+
+## Ejemplo de trazabilidad de punta a punta
+
+Cualquier cambio se puede reconstruir con enlaces, desde el Work Item hasta el release, sin depender de capturas. Ejemplo: el dashboard interactivo de la versión 2.1.0.
+
+| Paso | Evidencia | Enlace |
+|---|---|---|
+| **Task** | User Story AB#57: *Dashboard interactivo: indicadores que filtran la lista de incidentes* (Sprint 4, Feature AB#10) | [AB#57](https://dev.azure.com/devopsArrow/ArrowOps/_workitems/edit/57) |
+| **feature/\*** | Rama `feature/dashboard-interactivo`, creada desde `main` | [PR #25 → Commits](https://github.com/EmilioAlonzo4587/arrowops/pull/25/commits) |
+| **Commit AB#ID** | `8b4bd69` *feat: indicadores del dashboard clicables que filtran la lista AB#57* | [8b4bd69](https://github.com/EmilioAlonzo4587/arrowops/commit/8b4bd695ed59f25357c4ebcf28e246487504c39c) |
+| **PR** | PR #25 con la plantilla: Work Item, descripción, evidencia y checklist | [PR #25](https://github.com/EmilioAlonzo4587/arrowops/pull/25) |
+| **Review** | Auto-revisión con 4 comentarios en el diff y 6/6 checks en verde (incluido Azure, build 63) | [Files changed](https://github.com/EmilioAlonzo4587/arrowops/pull/25/files) |
+| **main** | Merge commit `d6cc075`, que conserva el commit con su `AB#57` | [d6cc075](https://github.com/EmilioAlonzo4587/arrowops/commit/d6cc07584f70ec26d5687591fe22d196598a06b7) |
+| **Pipeline** | Build 64: CI y despliegue automático a `dev`. Después, el tag `v2.1.0` (en `ffe4b68`) disparó el build 70: CI → `dev` → aprobación manual → `prod` | [Build 64](https://dev.azure.com/devopsArrow/ArrowOps/_build/results?buildId=64) · [Build 70](https://dev.azure.com/devopsArrow/ArrowOps/_build/results?buildId=70) |
+| **Artifact** | `arrowops-2.1.0.tgz` (SHA-256 `1e8a2697…3048`) e imagen `arrowops:2.1.0-70` | [Artefactos del build 70](https://dev.azure.com/devopsArrow/ArrowOps/_build/results?buildId=70&view=artifacts) |
+| **Release** | GitHub Release v2.1.0, con el mismo `.tgz` y el enlace al build 70 | [v2.1.0](https://github.com/EmilioAlonzo4587/arrowops/releases/tag/v2.1.0) |
+
+En sentido inverso, el Work Item AB#57 muestra en su sección *Development* el commit y el PR enlazados, y el Release enlaza a la ejecución del pipeline. El mismo recorrido aplica a cualquier PR de la tabla de historial.
 
 ## Commits
 
@@ -89,3 +110,4 @@ A partir del PR #5 se usará **merge commit**: conserva en `main` cada commit in
 | [#26](https://github.com/EmilioAlonzo4587/arrowops/pull/26) | `feature/interfaz-tecnica` | AB#58 | (v2.1.0) |
 | [#27](https://github.com/EmilioAlonzo4587/arrowops/pull/27) | `feature/release-v2.1.0` | AB#59 | **v2.1.0** |
 | [#28](https://github.com/EmilioAlonzo4587/arrowops/pull/28) | `feature/cierre-release-v2.1.0` | AB#59 | — |
+| [#29](https://github.com/EmilioAlonzo4587/arrowops/pull/29) | `feature/documentacion-entrega` | AB#60 | — |
