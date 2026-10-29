@@ -8,6 +8,7 @@
 | [seguridad.md](seguridad.md) | Manejo de secretos, controles de seguridad e incidentes |
 | [dependencias.md](dependencias.md) | Inventario y análisis de vulnerabilidades de paquetes |
 | [release.md](release.md) | Versionado semántico, ambientes, aprobaciones y artefactos |
+| [fallos-pipeline.md](fallos-pipeline.md) | Fallos del pipeline: evidencia, diagnóstico, corrección y ejecución exitosa |
 | [backlog-ids.csv](backlog-ids.csv) | IDs de los Work Items creados en Azure Boards |
 
 Los documentos se actualizan en cada fase. Cada uno indica qué está **implementado** y qué está **planificado**.
