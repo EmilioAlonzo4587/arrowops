@@ -1,5 +1,7 @@
 // Configuracion de la app leida de variables de entorno.
 // Ningun valor sensible vive en el codigo: ver .env.example y docs/seguridad.md.
+const { version } = require('../../package.json');
+
 const ENVIRONMENTS = ['development', 'test', 'production'];
 
 function loadConfig(env = process.env) {
@@ -22,7 +24,8 @@ function loadConfig(env = process.env) {
   return {
     port,
     nodeEnv,
-    appVersion: env.npm_package_version || 'dev',
+    // Desde package.json: funciona igual con npm start que con node dentro del contenedor.
+    appVersion: version,
     databaseUrl,
   };
 }
