@@ -68,6 +68,6 @@ Los errores siempre responden con el formato `{ "errors": ["mensaje", ...] }`.
 |---|---|---|
 | Planificación | Azure Boards: Epics, Features, Stories, Tasks y Sprints 1 a 3 | Implementado |
 | Código y revisión | GitHub: ramas `feature/*`, `fix/*`, `refactor/*`, PR y `main` protegida | Implementado |
-| CI | Azure Pipelines (`azure-pipelines.yml`) con agente autohospedado | Planificado (Fase 2) |
+| CI | Azure Pipelines: pipeline `ArrowOps-CI` (`azure-pipelines.yml`) en el agente autohospedado `PC-EMILIO` (pool `ArrowOps-SelfHosted`) | Implementado |
 | Checks de PR | GitHub Actions (`.github/workflows/`) | Planificado (Fase 2) |
 | Release | Artefacto versionado y ambientes `dev` → `prod` con aprobación | Planificado (Fase 3) |

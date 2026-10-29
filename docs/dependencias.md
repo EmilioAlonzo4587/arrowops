@@ -8,6 +8,7 @@ Las versiones están fijadas exactamente en `package.json` (`--save-exact`). `pa
 |---|---|---|---|
 | `express` | 4.22.3 | producción | Servidor HTTP y API |
 | `jest` | 29.7.0 | desarrollo | Ejecución de pruebas |
+| `jest-junit` | 17.0.0 | desarrollo | Reporte JUnit de pruebas para Azure Pipelines |
 | `supertest` | 7.3.1 | desarrollo | Pruebas HTTP de la API |
 
 ## Herramientas
@@ -15,7 +16,8 @@ Las versiones están fijadas exactamente en `package.json` (`--save-exact`). `pa
 | Herramienta | Cuándo | Estado |
 |---|---|---|
 | `npm audit` | Manual, en cada cambio de dependencias | Implementado |
-| `npm audit` en Azure Pipelines | En cada ejecución del pipeline | Planificado (Fase 2) |
+| `npm audit --omit=dev --audit-level=high` en Azure Pipelines | En cada ejecución; **bloquea** el build si hay vulnerabilidades altas o críticas en producción | Implementado |
+| `npm audit` completo en Azure Pipelines | En cada ejecución; informativo, registra una advertencia | Implementado |
 | Revisión de dependencias en GitHub Actions | En cada PR | Planificado (Fase 2) |
 | Dependabot | Alertas y PR de actualización semanales | Planificado (Fase 2) |
 
@@ -40,6 +42,19 @@ Las versiones están fijadas exactamente en `package.json` (`--save-exact`). `pa
 - Es una dependencia de desarrollo: no se instala en producción ni se incluye en el artefacto.
 - La corrección que propone npm (`npm audit fix --force`) bajaría `jest` a la 25.1.0. Es un cambio incompatible a una versión más antigua y sin soporte, y su riesgo es mayor que el que corrige.
 - Se revisará cuando Jest publique una versión con `deepmerge` corregido; Dependabot avisará. Queda registrada como deuda TD-07.
+
+### 2026-10-29: pipeline del PR #6 (agregado `jest-junit`)
+
+| Alcance | Críticas | Altas | Moderadas | Bajas |
+|---|---|---|---|---|
+| Producción | 0 | 0 | 0 | 0 |
+| Desarrollo | 0 | 0 | **2** | 6 |
+
+| Advisory | Paquete | Severidad | Descripción | Cadena |
+|---|---|---|---|---|
+| [GHSA-w5hq-g745-h8pq](https://github.com/advisories/GHSA-w5hq-g745-h8pq) | `uuid` < 11.1.1 (instalado 8.3.2) | Moderada | Falta comprobar los límites del buffer en v3/v5/v6 cuando se pasa `buf` | `jest-junit@16.0.0` → `uuid` |
+
+**Decisión: corregir.** Hay una versión compatible para el uso que le damos: `jest-junit` 17.0.0, que trae `uuid` 14.0.3. El cambio de versión mayor solo afecta al reporter de pruebas; se comprobó que el reporte JUnit y las 22 pruebas siguen funcionando. Tras la corrección: producción 0, desarrollo 6 bajas (las ya aceptadas). Detectado por el pipeline; ver [fallos-pipeline.md](fallos-pipeline.md), F-01.
 
 ## Criterio de decisión
 
