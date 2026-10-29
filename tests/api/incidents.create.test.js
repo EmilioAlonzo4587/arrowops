@@ -27,6 +27,11 @@ describe('validateIncident', () => {
     ]);
   });
 
+  // Contrato del limite: debe coincidir con maxlength="120" de frontend/index.html (ver F-02).
+  test('acepta un titulo de exactamente 120 caracteres', () => {
+    expect(validateIncident({ ...validIncident, title: 'x'.repeat(120) })).toEqual([]);
+  });
+
   test('rechaza un titulo demasiado largo', () => {
     const errors = validateIncident({ ...validIncident, title: 'x'.repeat(121) });
     expect(errors).toEqual([expect.stringContaining('120')]);
