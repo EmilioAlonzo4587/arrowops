@@ -12,6 +12,12 @@ Las versiones están fijadas exactamente en `package.json` (`--save-exact`). `pa
 | `jest-junit` | 17.0.0 | desarrollo | Reporte JUnit de pruebas para Azure Pipelines |
 | `supertest` | 7.3.1 | desarrollo | Pruebas HTTP de la API |
 
+**Recursos de terceros fuera de npm**
+
+| Recurso | Versión | Licencia | Uso y decisión |
+|---|---|---|---|
+| IBM Plex Sans (400, 500, 600) e IBM Plex Mono (400, 500), subconjunto latino `.woff2` | `@fontsource` 5.1.0 | SIL OFL 1.1 ([frontend/fonts/OFL.txt](../frontend/fonts/OFL.txt)) | Tipografía de la interfaz (AB#58). Se versionan en `frontend/fonts/` en lugar de cargarlas desde Google Fonts o un CDN: la app funciona sin internet, no envía datos de los usuarios a terceros y no agrega un paquete npm. Son archivos estáticos sin código ejecutable, así que `npm audit` no aplica; se actualizan a mano. |
+
 ## Herramientas
 
 | Herramienta | Cuándo | Estado |

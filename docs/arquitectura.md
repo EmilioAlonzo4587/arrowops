@@ -25,7 +25,7 @@ flowchart LR
 | Modelo | `backend/src/models/incident.js` | Estados y prioridades válidos; `validateIncident()` |
 | Repositorio PostgreSQL | `backend/src/repositories/postgresIncidentRepository.js` | Persistencia real con consultas parametrizadas (asíncrono) |
 | Repositorio en memoria | `backend/src/repositories/incidentRepository.js` | Misma interfaz sobre un `Map`; se usa sin `DATABASE_URL` (desarrollo rápido y pruebas unitarias) |
-| Frontend | `frontend/` | `index.html`, `src/api.js` (cliente HTTP), `src/form.js` (formulario), `src/dashboard.js` (indicadores), `src/app.js` (filtros, tabla, operaciones e historial) |
+| Frontend | `frontend/` | `index.html`, `src/api.js` (cliente HTTP), `src/form.js` (formulario), `src/dashboard.js` (indicadores), `src/app.js` (filtros, tabla, operaciones, historial y estado del sistema), `src/styles.css` (tema visual), `fonts/` (IBM Plex, servida localmente) |
 | Pruebas | `tests/api/`, `tests/contract/` | Jest + Supertest. Las **pruebas de contrato** corren la misma batería contra los dos repositorios; las de PostgreSQL se ejecutan si hay `DATABASE_URL` (siempre en CI) |
 | Ejecución completa | `docker-compose.yml` y `Dockerfile` (raíz) | Un `docker compose up` levanta la app (construida desde el código con el mismo empaquetado del CI) y PostgreSQL con esquema y datos de ejemplo |
 | Base de datos | `database/` | `docker-compose.yml` (PostgreSQL 17, puerto 5433), `schema.sql` (tabla `incidents` con restricciones e índices) y `seed.sql` |

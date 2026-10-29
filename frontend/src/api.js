@@ -61,6 +61,10 @@ const api = {
   getMeta() {
     return request('/api/meta');
   },
+
+  getHealth() {
+    return request('/health');
+  },
 };
 
 async function request(url, options = {}) {

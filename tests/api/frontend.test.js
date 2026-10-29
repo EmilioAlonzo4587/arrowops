@@ -16,6 +16,12 @@ describe('frontend estatico', () => {
     expect(res.text).toContain('<option value="none">Sin asignar</option>');
   });
 
+  test('sirve las fuentes locales para funcionar sin internet', async () => {
+    const res = await request(createApp()).get('/fonts/ibm-plex-sans-latin-400-normal.woff2');
+    expect(res.status).toBe(200);
+    expect(res.headers['content-type']).toMatch(/woff2/);
+  });
+
   test('sirve los scripts del frontend', async () => {
     const res = await request(createApp()).get('/src/app.js');
     expect(res.status).toBe(200);

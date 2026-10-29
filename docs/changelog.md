@@ -7,6 +7,10 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); v
 ### Agregado
 - **Dashboard interactivo (AB#57):** las tarjetas *Abiertos*, *Críticos abiertos*, *Cerrados* y *Total*, y las barras por categoría y por técnico, filtran la lista de incidentes al hacer clic.
 - Filtros `open=true` (incidentes `NUEVO`, `ASIGNADO` o `EN_PROCESO`) y `technicianId=none` (sin técnico) en `GET /api/incidents`, y sus opciones *Abiertos* y *Sin asignar* en la barra de filtros.
+- Indicador de estado del sistema en el encabezado (en línea y versión desplegada, según `/health`) (AB#58).
+
+### Cambiado
+- **Rediseño visual (AB#58):** fondo con cuadrícula técnica discreta, encabezado oscuro, logotipo con flecha bajo el nombre, tipografía IBM Plex Sans y Plex Mono (servida localmente, sin internet), y paneles, tabla, insignias y filtros con un estilo más sobrio.
 
 ## [2.0.1] - 2026-10-29
 

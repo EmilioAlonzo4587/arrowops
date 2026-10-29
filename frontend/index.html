@@ -4,12 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ArrowOps</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230b1320'/%3E%3Cpath d='M6 21h16' stroke='%2338bdf8' stroke-width='3'/%3E%3Cpath d='M21 15l7 6-7 6z' fill='%2338bdf8'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="src/styles.css">
 </head>
 <body>
   <header class="topbar">
-    <h1>ArrowOps</h1>
-    <p>Gestion de incidentes de TI</p>
+    <div class="topbar-inner">
+      <div class="brand">
+        <h1 class="brand-name">Arrow<span>Ops</span></h1>
+        <p class="brand-tagline">Gestion de incidentes de TI</p>
+      </div>
+      <!-- Estado del servicio segun GET /health. -->
+      <div id="system-status" class="system-status" role="status">
+        <span class="status-dot"></span><span id="system-status-text">Verificando...</span>
+      </div>
+    </div>
   </header>
 
   <main class="container">
@@ -26,7 +35,7 @@
           <span class="card-value" id="kpi-criticos">-</span><span class="card-label">Criticos abiertos</span></button>
         <button type="button" class="card card-ok" data-filters='{"status":"CERRADO"}' data-label="Cerrados">
           <span class="card-value" id="kpi-cerrados">-</span><span class="card-label">Cerrados</span></button>
-        <button type="button" class="card" data-filters='{}' data-label="Todos">
+        <button type="button" class="card card-total" data-filters='{}' data-label="Todos">
           <span class="card-value" id="kpi-total">-</span><span class="card-label">Total</span></button>
       </div>
       <div class="charts">
