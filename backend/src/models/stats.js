@@ -13,7 +13,9 @@ function countBy(items, keyOf, keys = []) {
   return counts;
 }
 
-function computeStats(incidents) {
+// technicians: catalogo activo [{id, name}]. Todos aparecen en porTecnico aunque tengan 0
+// abiertos, para que el dashboard muestre tambien a quien no tiene carga.
+function computeStats(incidents, technicians = []) {
   const open = incidents.filter((i) => OPEN_STATUSES.includes(i.status));
   return {
     total: incidents.length,
@@ -25,8 +27,12 @@ function computeStats(incidents) {
     criticos: open.filter((i) => i.priority === 'critica').length,
     porEstado: countBy(incidents, (i) => i.status, STATUSES),
     porCategoria: countBy(incidents, (i) => i.category, CATEGORIES),
-    // Carga de trabajo: incidentes abiertos por tecnico.
-    porTecnico: countBy(open, (i) => (i.technician ? i.technician.name : UNASSIGNED)),
+    // Carga de trabajo: incidentes abiertos por tecnico, mas los abiertos sin tecnico (UNASSIGNED).
+    porTecnico: countBy(
+      open,
+      (i) => (i.technician ? i.technician.name : UNASSIGNED),
+      [...technicians.map((t) => t.name), UNASSIGNED],
+    ),
   };
 }
 

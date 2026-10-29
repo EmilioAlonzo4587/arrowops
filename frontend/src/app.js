@@ -261,7 +261,22 @@ async function handleAssign(event) {
   }
 }
 
+// Indicador del encabezado: servicio en linea y version desplegada.
+async function loadSystemStatus() {
+  const statusEl = document.getElementById('system-status');
+  const textEl = document.getElementById('system-status-text');
+  try {
+    const health = await api.getHealth();
+    statusEl.className = 'system-status online';
+    textEl.textContent = `Sistema operativo · v${health.version}`;
+  } catch {
+    statusEl.className = 'system-status offline';
+    textEl.textContent = 'Sin conexion con el servidor';
+  }
+}
+
 async function init() {
+  loadSystemStatus();
   try {
     const [meta, technicians] = await Promise.all([api.getMeta(), api.listTechnicians()]);
     state.transitions = meta.transitions;

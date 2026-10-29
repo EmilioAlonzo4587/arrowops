@@ -167,7 +167,10 @@ function createTechniciansRouter(repository) {
 // Indicadores del dashboard sobre todos los incidentes.
 function createStatsRouter(repository) {
   const router = express.Router();
-  router.get('/', async (req, res) => res.json(computeStats(await repository.list())));
+  router.get('/', async (req, res) => {
+    const [incidents, technicians] = await Promise.all([repository.list(), repository.listTechnicians()]);
+    return res.json(computeStats(incidents, technicians));
+  });
   return router;
 }
 
