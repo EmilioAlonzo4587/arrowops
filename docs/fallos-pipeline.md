@@ -92,7 +92,7 @@ Tests:       1 failed, 21 passed, 22 total
 
 ### Ejecución exitosa
 
-Ver el check del PR #7 después del commit de corrección. El enlace se registra aquí al confirmarlo.
+[#20261029.7](https://dev.azure.com/devopsArrow/ArrowOps/_build/results?buildId=16) (buildId 16), disparada por el PR #7 con el commit `91e7bc6`: resultado **succeeded**, 23 pruebas en verde y el artefacto publicado. El estado del PR pasó de `BLOCKED` a `CLEAN`, así que el merge quedó habilitado.
 
 ### Lecciones (F-02)
 
