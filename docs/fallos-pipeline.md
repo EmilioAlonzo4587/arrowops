@@ -45,7 +45,7 @@ La ejecución anterior en la misma rama ([#20261029.1](https://dev.azure.com/dev
 
 ### Ejecución exitosa
 
-Ver el check del PR #6 después de los commits de corrección. El enlace se registra aquí al confirmarlo.
+[#20261029.3](https://dev.azure.com/devopsArrow/ArrowOps/_build/results?buildId=12) (buildId 12), disparada por el PR #6 con los commits `9e9a04e` y `f0774a5`: resultado **succeeded**. Todos los pasos en verde, el audit informativo registra una advertencia (6 vulnerabilidades bajas aceptadas) y se publicó el artefacto `arrowops`.
 
 ### Lecciones
 
