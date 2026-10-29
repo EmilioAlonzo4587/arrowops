@@ -1,0 +1,32 @@
+# PostgreSQL de ArrowOps para desarrollo local y CI.
+# La contrasena NO esta en este archivo: se toma de la variable POSTGRES_PASSWORD
+# (archivo .env en la raiz, ignorado por git, o variable secreta del pipeline).
+#
+#   docker compose --env-file .env -f database/docker-compose.yml up -d --wait
+#   docker compose --env-file .env -f database/docker-compose.yml down
+
+name: arrowops
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: arrowops
+      POSTGRES_USER: arrowops
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Definir POSTGRES_PASSWORD en .env o en el entorno}
+    ports:
+      # 5433 en el host para no chocar con otros PostgreSQL locales en 5432.
+      - "${ARROWOPS_DB_PORT:-5433}:5432"
+    volumes:
+      - arrowops-data:/var/lib/postgresql/data
+      # Se ejecutan solo al crear el volumen por primera vez, en orden alfabetico.
+      - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U arrowops -d arrowops"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  arrowops-data:
