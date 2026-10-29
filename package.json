@@ -6,6 +6,8 @@
   "main": "backend/src/server.js",
   "files": [
     "backend/src",
+    "database/migrations",
+    "database/seed.sql",
     "frontend",
     "README.md"
   ],

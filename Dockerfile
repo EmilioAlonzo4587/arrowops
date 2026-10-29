@@ -7,6 +7,7 @@ FROM node:22-alpine AS pack
 WORKDIR /src
 COPY package.json package-lock.json README.md ./
 COPY backend ./backend
+COPY database ./database
 COPY frontend ./frontend
 RUN npm pack
 
