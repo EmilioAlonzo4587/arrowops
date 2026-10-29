@@ -1,0 +1,59 @@
+# Checks complementarios de GitHub Actions para ArrowOps.
+# Azure Pipelines (azure-pipelines.yml) sigue siendo el CI principal y genera el artefacto;
+# este workflow agrega pruebas en Linux con varias versiones de Node y la revision de
+# dependencias que introduce cada PR.
+
+name: PR checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Build y pruebas (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Verificar sintaxis (build)
+        run: npm run build
+
+      - name: Pruebas
+        run: npm test -- --ci
+
+      - name: Audit de dependencias de produccion
+        run: npm audit --omit=dev --audit-level=high
+
+  dependency-review:
+    name: Revision de dependencias
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Falla si el PR agrega dependencias con vulnerabilidades moderadas o mas graves.
+      - uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate

@@ -99,3 +99,15 @@ Tests:       1 failed, 21 passed, 22 total
 - El check obligatorio funcionó: la regresión no pudo entrar a `main` y no se generó el artefacto.
 - Los límites que comparten el frontend y el backend necesitan pruebas de los valores límite (N y N+1), no solo del caso inválido.
 - Duplicar las reglas entre el cliente y el servidor (deuda TD-05) hace que este tipo de error sea más probable.
+
+## F-03: falla "Revision de dependencias" en GitHub Actions (PR #8)
+
+| Campo | Detalle |
+|---|---|
+| Fecha | 2026-10-29 |
+| Workflow / job | `PR checks` / `Revision de dependencias` (`actions/dependency-review-action@v4`) |
+| Error | `Dependency review is not supported on this repository. Please ensure that Dependency graph is enabled` |
+| Diagnóstico | Es un problema de configuración del repositorio, no del código: la acción necesita el *Dependency graph* de GitHub, que estaba desactivado. Los otros 3 checks del PR (ArrowOps-CI y las pruebas con Node 20 y 22) estaban en verde |
+| Corrección | Se activaron las alertas de Dependabot (`PUT /repos/{owner}/{repo}/vulnerability-alerts`, respuesta 204), lo que habilita el Dependency graph, y se volvió a ejecutar el job fallido (`gh run rerun --failed`) |
+| Ejecución exitosa | Run `40802055601` → **success**; los 4 checks del PR #8 en verde |
+| Lección | Las acciones de seguridad de GitHub dependen de funciones del repositorio que hay que activar y documentar como parte de la configuración (ver [seguridad.md](seguridad.md)) |
