@@ -6,7 +6,7 @@ Deudas reales que se detectaron durante el desarrollo. Cada una tiene su Work It
 
 | ID | Deuda | Dónde se detectó | Impacto | Severidad | Estado |
 |---|---|---|---|---|---|
-| TD-01 | AB#33 | **Persistencia en memoria.** El repositorio guarda los incidentes en un `Map` y se pierden al reiniciar | Comentario de revisión del PR #1 | No apto para producción; los datos no sobreviven a un despliegue | Alta | **En resolución** (PR #15) |
+| TD-01 | AB#33 | **Persistencia en memoria.** El repositorio guarda los incidentes en un `Map` y se pierden al reiniciar | Comentario de revisión del PR #1 | No apto para producción; los datos no sobreviven a un despliegue | Alta | **Resuelta** (PR #15): PostgreSQL 17 en Docker |
 | TD-02 | AB#34 | **Finales de línea sin normalizar.** No hay `.gitattributes`; Git avisa "LF will be replaced by CRLF" en cada commit desde Windows | Advertencias en todos los commits | Diffs ruidosos y posibles fallos de scripts en agentes Linux | Media | Identificada |
 | TD-03 | AB#35 | **Sin linter ni formato automático.** No hay ESLint; `app.js` incluso tiene un comentario `eslint-disable` que no tiene efecto | Revisión del código del PR #1 | El estilo depende de la disciplina manual; los errores comunes no se detectan antes del PR | Media | Identificada |
 | TD-04 | AB#36 | **Orden no determinista.** `list()` ordena por `createdAt`; los incidentes creados en el mismo milisegundo quedan en orden de inserción, no del más reciente al más antiguo | Comentario de revisión del PR #2 | El orden de la tabla puede variar entre recargas | Baja | Identificada |
@@ -33,3 +33,4 @@ Las demás (TD-03 a TD-06) quedan en el backlog con su prioridad para versiones 
 | 2026-10-28 | Registro inicial: TD-01 a TD-08 |
 | 2026-10-29 | TD-07: jest 30 (PR #12) reduce las vulnerabilidades bajas de 6 a 5, pero `deepmerge` sigue presente; se mantiene aceptada |
 | 2026-10-29 | Se registran las deudas en Azure Boards (AB#33 a AB#40). **Se reprioriza TD-01:** con Docker Desktop ya disponible en el equipo de desarrollo, migrar a PostgreSQL deja de exceder el alcance de v1.0.0. Pasa a ser la primera deuda a resolver, por ser la de mayor impacto; TD-03 queda como opcional |
+| 2026-10-29 | **TD-01 resuelta** en el PR #15: PostgreSQL en Docker, repositorio con la misma interfaz, pruebas de contrato contra los dos repositorios e integración en GitHub Actions y Azure Pipelines. La contraseña se maneja como secreto en los dos CI |
