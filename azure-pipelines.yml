@@ -1,3 +1,81 @@
-# Pipeline CI/CD de ArrowOps.
-# Se completa en la Fase 2: checkout, instalacion, build, pruebas,
-# revision de dependencias/seguridad, empaquetado y publicacion de artefacto.
+# Pipeline CI de ArrowOps.
+# Etapas: checkout, instalacion, build, pruebas, revision de dependencias,
+# empaquetado y publicacion del artefacto. Corre en el agente autohospedado.
+
+name: $(Date:yyyyMMdd)$(Rev:.r)
+
+trigger:
+  branches:
+    include:
+      - main
+
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  name: ArrowOps-SelfHosted
+
+variables:
+  nodeVersion: '22.x'
+  npm_config_cache: $(Pipeline.Workspace)/.npm
+
+stages:
+  - stage: CI
+    displayName: Integracion continua
+    jobs:
+      - job: build_test_package
+        displayName: Build, pruebas y empaquetado
+        steps:
+          - checkout: self
+            clean: true
+            displayName: Checkout
+
+          - task: NodeTool@0
+            displayName: Instalar Node.js $(nodeVersion)
+            inputs:
+              versionSpec: $(nodeVersion)
+
+          - script: npm ci
+            displayName: Restaurar dependencias (npm ci)
+
+          - script: npm run build
+            displayName: Build
+
+          - script: npm run test:ci
+            displayName: Pruebas con cobertura
+
+          - task: PublishTestResults@2
+            displayName: Publicar resultados de pruebas
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: JUnit
+              testResultsFiles: reports/junit.xml
+              testRunTitle: ArrowOps $(Build.BuildNumber)
+              failTaskOnFailedTests: true
+
+          - task: PublishCodeCoverageResults@2
+            displayName: Publicar cobertura
+            condition: succeededOrFailed()
+            inputs:
+              summaryFileLocation: coverage/cobertura-coverage.xml
+
+          # Bloqueante: cualquier vulnerabilidad alta o critica en produccion rompe el build.
+          - script: npm audit --omit=dev --audit-level=high
+            displayName: Revision de dependencias de produccion (bloqueante)
+
+          # Informativo: reporte completo, incluidas las de desarrollo (ver docs/dependencias.md).
+          - script: npm audit
+            displayName: Reporte completo de dependencias (informativo)
+            continueOnError: true
+
+          - script: npm pack --pack-destination "$(Build.ArtifactStagingDirectory)"
+            displayName: Empaquetar artefacto (npm pack)
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publicar artefacto
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)
+              artifact: arrowops
+              publishLocation: pipeline
