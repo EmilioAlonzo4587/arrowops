@@ -25,6 +25,7 @@ La versión vive en `package.json` y se marca con un **tag anotado** `vX.Y.Z` so
 | v1.0.0 | **Primera versión estable:** persistencia en PostgreSQL (TD-01), finales de línea normalizados (TD-02), ambientes `dev` y `prod` en Docker con aprobación manual y GitHub Release | PR #15 a #17 | **Publicada** (tag + GitHub Release, desplegada en `prod`) |
 | v2.0.0 | **MAJOR:** alcance funcional completo (categoría, técnicos, flujo de estados, bitácora, filtros y dashboard). Cambio incompatible en los estados, con migración automática de datos (ver [changelog.md](changelog.md)) | PR #19 a #22 | Tag publicado; **no desplegada a prod** (aprobación rechazada, F-04) |
 | v2.0.1 | **PATCH:** corrección del despliegue (F-04): workspace limpio, verificación de versión e imágenes inmutables. Primera 2.x en producción | PR #23 | **Publicada** (tag + GitHub Release, desplegada en `prod`) |
+| v2.1.0 | **MINOR:** dashboard interactivo (los indicadores filtran la lista; filtros `open=true` y `technicianId=none`), todos los técnicos en *Abiertos por técnico* y rediseño visual con tipografía local | PR #25 a #27 | En preparación |
 
 ## Artefacto
 
@@ -125,3 +126,15 @@ Estado final de los ambientes (contenedores en el agente `PC-EMILIO`):
 Dónde verificar cada evidencia, incluido el rechazo de la v2.0.0: [evidencias/](evidencias/README.md).
 
 **Por qué es un cambio MAJOR:** los valores de estado y el contrato de `POST`/`PUT` cambian de forma incompatible para los clientes de la API v1. SemVer exige incrementar `MAJOR` aunque los datos se migren automáticamente.
+
+## Checklist de release v2.1.0
+
+- [x] PR del alcance integrados en `main` con los checks en verde: #25 (dashboard interactivo, AB#57) y #26 (rediseño y abiertos por técnico, AB#58).
+- [x] **Despliegue continuo a `dev`** validado antes del tag: el merge del PR #25 desplegó a dev (build 64) y `GET /api/incidents?open=true&technicianId=none` respondió 200 (la 2.0.1 responde 400).
+- [x] `package.json` en `2.1.0` y `changelog.md` con la sección 2.1.0 (PR #27, Task AB#59).
+- [ ] Tag `v2.1.0` → CI → `dev` → verificación de dev **antes de aprobar** (un solo artefacto `arrowops-2.1.0.tgz`, imagen `arrowops:2.1.0-<build>`, `/health` con `version 2.1.0`) → **aprobación manual** → `prod`.
+- [ ] Prod: `/health` con `version 2.1.0` y los datos existentes intactos (sin migraciones nuevas en esta versión).
+- [ ] GitHub Release v2.1.0 con `arrowops-2.1.0.tgz` de la ejecución del tag y su SHA-256.
+- [ ] Work Items en `Closed`: Stories AB#57 y AB#58 (cerradas) y Task AB#59.
+
+**Por qué es un cambio MINOR:** agrega funcionalidad (filtros opcionales y un dashboard interactivo) sin romper a los clientes de 2.0.x. **Rollback:** como no hay migraciones, volver a 2.0.1 es seguro con el procedimiento de [Rollback](#rollback).

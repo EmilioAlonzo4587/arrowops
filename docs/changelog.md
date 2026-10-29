@@ -2,7 +2,9 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); versiones según [Semantic Versioning](https://semver.org/lang/es/).
 
-## [Sin publicar]
+## [2.1.0] - 2026-10-29
+
+Versión **MINOR**: agrega funcionalidad compatible con 2.0.x. No hay migraciones de base de datos ni cambios incompatibles en la API: los filtros nuevos son opcionales y `/api/stats` conserva su forma.
 
 ### Agregado
 - **Dashboard interactivo (AB#57):** las tarjetas *Abiertos*, *Críticos abiertos*, *Cerrados* y *Total*, y las barras por categoría y por técnico, filtran la lista de incidentes al hacer clic.
