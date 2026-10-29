@@ -22,7 +22,7 @@ La versión vive en `package.json` y se marca con un **tag anotado** `vX.Y.Z` so
 | v0.2.0 | CRUD completo e interfaz web | PR #2 a #4 | Publicada (tag) |
 | v0.3.0 | Integración continua: Azure Pipelines en el agente autohospedado, artefacto, GitHub Actions y Dependabot | PR #6 a #8 | Publicada (tag) |
 | v0.4.0 | Calidad y seguridad: Express 5 y jest 30 (Dependabot), configuración por variables de entorno, 100% de cobertura de líneas con umbral en CI, escaneo de secretos con gitleaks | PR #9 a #14 | Publicada (tag) |
-| v1.0.0 | **Primera versión estable:** persistencia en PostgreSQL (TD-01), finales de línea normalizados (TD-02), ambientes `dev` y `prod` en Docker con aprobación manual y GitHub Release | PR #15 a #17 | Ver checklist |
+| v1.0.0 | **Primera versión estable:** persistencia en PostgreSQL (TD-01), finales de línea normalizados (TD-02), ambientes `dev` y `prod` en Docker con aprobación manual y GitHub Release | PR #15 a #17 | **Publicada** (tag + GitHub Release, desplegada en `prod`) |
 
 ## Artefacto
 
@@ -81,10 +81,27 @@ Para volver atrás se despliega de nuevo una versión anterior, sin reconstruir 
 El volumen de datos no se toca en un rollback. Los cambios de esquema son aditivos (`CREATE ... IF NOT EXISTS`), así que una versión anterior sigue siendo compatible con la base de datos.
 ## Checklist de release v1.0.0
 
-- [ ] Todos los PR del alcance integrados en `main` con CI en verde.
-- [ ] `package.json` con la versión nueva.
-- [ ] Tag anotado `vX.Y.Z` creado y publicado.
-- [ ] Artefacto generado y publicado.
-- [ ] Despliegue en `dev` validado.
-- [ ] Aprobación de `prod` registrada.
-- [ ] Work Items del alcance en `Closed`.
+- [x] Todos los PR del alcance integrados en `main` con CI en verde: PR #15 (TD-01), #16 (TD-02) y #17 (release), con los 5 checks obligatorios.
+- [x] `package.json` con la versión nueva: `1.0.0` (PR #17).
+- [x] Tag anotado `v1.0.0` creado y publicado sobre `47f1550` (merge del PR #17).
+- [x] Artefacto generado y publicado: `arrowops-1.0.0.tgz`, artefacto de pipeline `arrowops` de la ejecución 46 y adjunto al [GitHub Release v1.0.0](https://github.com/EmilioAlonzo4587/arrowops/releases/tag/v1.0.0) con su SHA-256.
+- [x] Despliegue en `dev` validado: ejecución [#20261029.36](https://dev.azure.com/devopsArrow/ArrowOps/_build/results?buildId=45) (merge a `main`) y de nuevo en [#20261029.37](https://dev.azure.com/devopsArrow/ArrowOps/_build/results?buildId=46) (tag). Health check: `{"status":"ok","version":"1.0.0"}` en http://localhost:8081.
+- [x] Aprobación de `prod` registrada: en la ejecución #20261029.37, la etapa `Desplegar en prod` esperó la autorización del Environment y la **aprobación manual** (`Checkpoint.Approval: succeeded`) antes de desplegar. Health check: `Health check OK: http://localhost:8080/health -> version 1.0.0`.
+- [x] Work Items del alcance en `Closed`: AB#29, AB#31, la Feature AB#25 y la Epic AB#17. Quedan en el backlog, a propósito, las deudas TD-03 a TD-07 (AB#35 a AB#39) para versiones posteriores.
+
+### Evidencia del flujo de release v1.0.0
+
+| Paso | Ejecución | Resultado |
+|---|---|---|
+| PR #17 (solo CI) | #20261029.35 (build 44) | CI ✅, `Deploy_dev` y `Deploy_prod` **omitidos** (nunca se despliega desde un PR) |
+| Merge a `main` | #20261029.36 (build 45) | CI ✅ → autorización del Environment `arrowops-dev` → `Deploy_dev` ✅; `Deploy_prod` omitido (no es tag) |
+| Tag `v1.0.0` | #20261029.37 (build 46) | CI ✅ → `Deploy_dev` ✅ → **en espera** (autorización y aprobación de `arrowops-prod`) → aprobado → `Deploy_prod` ✅ |
+
+Estado final de los ambientes (contenedores en el agente `PC-EMILIO`):
+
+| Contenedor | Estado | Puertos |
+|---|---|---|
+| `arrowops-prod-app-1` | healthy | `8080 → 3000` |
+| `arrowops-prod-db-1` | healthy | solo interno (`5432/tcp`) |
+| `arrowops-dev-app-1` | healthy | `8081 → 3000` |
+| `arrowops-dev-db-1` | healthy | solo interno (`5432/tcp`) |
