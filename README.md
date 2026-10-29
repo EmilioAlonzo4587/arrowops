@@ -1,6 +1,8 @@
 # ArrowOps
 
-ArrowOps es una solución web para registrar, dar seguimiento y cerrar incidentes de TI. El proyecto demuestra un proceso DevOps verificable, desde la necesidad del negocio hasta la versión `v1.0.0`.
+ArrowOps es una solución web para registrar, dar seguimiento y cerrar incidentes de TI. El proyecto demuestra un proceso DevOps verificable, desde la necesidad del negocio hasta una versión estable con release controlado.
+
+**Funcionalidad:** alta y consulta de incidentes con título, descripción, categoría, prioridad, usuario, fecha y estado; asignación de técnico y flujo de estados `NUEVO` → `ASIGNADO` → `EN_PROCESO` → `RESUELTO` → `CERRADO`; bitácora con comentarios e historial por incidente; filtros por estado, prioridad, categoría y técnico; y dashboard con abiertos, cerrados, críticos y distribución por categoría y técnico.
 
 ## Estructura
 
